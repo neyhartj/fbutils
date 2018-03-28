@@ -1,28 +1,31 @@
+---
+output: github_document
+---
 
-<!-- README.md is generated from README.Rmd. Please edit the latter -->
-fbutils
-=======
+<!-- README.md is generated from README.Rmd. Please edit the latter -->  
 
+```{r, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>", fig.path = "README-", 
+                      eval = FALSE)
+```
+
+
+# fbutils
 [![Travis-CI Build Status](https://travis-ci.org/neyhartj/fbutils.svg?branch=master)](https://travis-ci.org/neyhartj/fbutils)
 
-Introduction
-------------
 
+## Introduction
 This package contains functions to handle the output from the Android FieldBook app. Information on the app can be founder [here](http://www.wheatgenetics.org/research/software/22-android-field-book) and the GitHub repository for Field Book can be found [here](https://github.com/trife/Field-Book). These functions are fairly basic and are meant for quick visualization of data throughout a field.
 
-Installation
-------------
-
+## Installation
 The package can be installed via the `devtools` package:
+```
+devtools::install_github("neyhartj/fbutils")
+```
 
-    devtools::install_github("neyhartj/fbutils")
+## Shiny
+This package is meant to be basic and quick to use. Therefore an accompanying [Shiny App](https://neyhartj.shinyapps.io/fbutils_shiny/) was created for use online. The web app
+works on an Android tablet, too!
 
-Shiny
------
-
-This package is meant to be basic and quick to use. Therefore an accompanying [Shiny App](https://neyhartj.shinyapps.io/fbutils_shiny/) was created for use online. The web app works on an Android tablet, too!
-
-Author
-------
-
+## Author
 Jeff Neyhart
