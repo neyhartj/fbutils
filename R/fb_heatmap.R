@@ -41,10 +41,14 @@ fb_heatmap <- function(fbt, traits) {
   ### Data manipulation
   
   # Gather the row and column information and the trait-value pairs
-  fbt1 <- fbt %>% 
-    select(which(names(.) %in% c("row", "column", traits))) %>% 
-    mutate(row = as.factor(row),
-           column = as.factor(column)) %>%
+  fbt1 <- fbt[,c("row", "column", traits)]
+  
+  # Change row and column to factors
+  fbt1$row <- as.factor(fbt1$row)
+  fbt1$column <- as.factor(fbt1$column)
+  
+  # Tidy
+  fbt1 <- fbt1 %>% 
     gather(trait, value, -row, -column)
   
   # Calculate mid-point for each trait

@@ -4,56 +4,20 @@
 
 ## R CMD Check comments
 
-checking examples ... ERROR
-Running examples in 'fbutils-Ex.R' failed
-The error most likely occurred in:
+There were no ERRORs or WARNINGs.
 
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: fb_visualize
-> ### Title: Visualize a summary of the field book data
-> ### Aliases: fb_visualize
-> 
-> ### ** Examples
-> 
-> data("fbt.sample")
-Warning in data("fbt.sample") : data set 'fbt.sample' not found
-> 
-> # For boxplots
-> fb_visualize(fbt = fbt.sample)
-Error in eval(lhs, parent, parent) : object 'fbt.sample' not found
-Calls: fb_visualize -> fb_traits -> %>% -> eval -> eval
-Execution halted
-
-checking Rd \usage sections ... WARNING
-Undocumented arguments in documentation object 'grid_cor'
-  'p_obs' 'rows' 'cols' 'grid.rows' 'grid.cols' 'layers'
-
-Functions with \usage entries need to have the appropriate \alias
-entries, and all their arguments documented.
-The \usage entries must correspond to syntactically valid R code.
-See chapter 'Writing R documentation files' in the 'Writing R
-Extensions' manual.
-
-checking top-level files ... NOTE
-Non-standard file/directory found at top level:
-  'fbutils_shiny'
-
-checking dependencies in R code ... NOTE
-There are ::: calls to the package's namespace in its code. A package
-  almost never needs to use ::: for its own objects:
-  'grid_cor'
 
 checking R code for possible problems ... NOTE
 as_field_book_table: no visible binding for global variable '.'
-fb_heatmap: no visible binding for global variable '.'
-fb_heatmap: no visible binding for global variable 'column'
 fb_heatmap: no visible binding for global variable 'trait'
 fb_heatmap: no visible binding for global variable 'value'
-fb_outliers: possible error in fb_traits(x = fbt, "numeric"): unused
-  argument (x = fbt)
+fb_heatmap: no visible binding for global variable 'column'
 fb_outliers: no visible binding for global variable '.'
 fb_outliers: no visible binding for global variable 'trait'
-... 42 lines ...
+fb_outliers: no visible binding for global variable 'value'
+fb_outliers: no visible binding for global variable 'unique_id'
+fb_outliers: no visible binding for global variable 'line_name'
+... 39 lines ...
 fb_visualize: no visible binding for global variable 'trait'
 fb_visualize: no visible binding for global variable 'value'
 read_fb: no visible global function definition for 'read.csv'
@@ -66,11 +30,115 @@ Consider adding
   importFrom("utils", "head", "read.csv")
 to your NAMESPACE file.
 
-checking Rd files ... NOTE
-prepare_Rd: fb_spatial_adj.Rd:43-45: Dropping empty section \details
 
-checking for unstated dependencies in vignettes ... NOTE
-'library' or 'require' call not declared from: 'tidyverse'
+
+
+
+fb_heatmap: no visible binding for global variable ‘trait’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_heatmap.R:51-52)
+fb_heatmap: no visible binding for global variable ‘value’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_heatmap.R:51-52)
+fb_heatmap: no visible binding for global variable ‘column’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_heatmap.R:51-52)
+fb_heatmap: no visible binding for global variable ‘trait’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_heatmap.R:55-59)
+fb_heatmap: no visible binding for global variable ‘value’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_heatmap.R:55-59)
+fb_heatmap: no visible binding for global variable ‘trait’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_heatmap.R:65-66)
+fb_heatmap: no visible binding for global variable ‘column’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_heatmap.R:69-74)
+fb_heatmap: no visible binding for global variable ‘value’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_heatmap.R:69-74)
+
+
+fb_outliers: no visible binding for global variable ‘.’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_outliers.R:43-45)
+fb_outliers: no visible binding for global variable ‘trait’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_outliers.R:43-45)
+fb_outliers: no visible binding for global variable ‘value’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_outliers.R:43-45)
+fb_outliers: no visible binding for global variable ‘unique_id’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_outliers.R:43-45)
+fb_outliers: no visible binding for global variable ‘line_name’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_outliers.R:43-45)
+fb_outliers: no visible binding for global variable ‘trait’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_outliers.R:48-54)
+fb_outliers: no visible binding for global variable ‘value’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_outliers.R:48-54)
+fb_outliers: no visible binding for global variable ‘value’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_outliers.R:48-54)
+fb_outliers: no visible binding for global variable ‘value’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_outliers.R:48-54)
+fb_outliers: no visible binding for global variable ‘value’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_outliers.R:61-62)
+fb_outliers: no visible binding for global variable ‘lower_bound’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_outliers.R:61-62)
+fb_outliers: no visible binding for global variable ‘value’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_outliers.R:61-62)
+fb_outliers: no visible binding for global variable ‘upper_bound’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_outliers.R:61-62)
+fb_outliers: no visible binding for global variable ‘is_outlier’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_outliers.R:65-67)
+fb_outliers: no visible binding for global variable ‘unique_id’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_outliers.R:65-67)
+fb_outliers: no visible binding for global variable ‘value’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_outliers.R:65-67)
+fb_outliers: no visible binding for global variable ‘trait’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_outliers.R:70-74)
+fb_outliers: no visible binding for global variable ‘is_outlier’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_outliers.R:70-74)
+fb_outliers: no visible binding for global variable ‘trait’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_outliers.R:80-81)
+fb_outliers: no visible binding for global variable ‘trait’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_outliers.R:92)
+
+
+fb_parse: no visible binding for global variable ‘.’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_parse.R:73-75)
+fb_parse: no visible binding for global variable ‘.’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_parse.R:73-75)
+
+
+fb_spatial_adj: no visible binding for global variable ‘g.row’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_spatial_adj.R:125-130)
+fb_spatial_adj: no visible binding for global variable ‘g.cols’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_spatial_adj.R:125-130)
+fb_spatial_adj : <anonymous>: no visible binding for global variable ‘g.row’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_spatial_adj.R:161-165)
+fb_spatial_adj : <anonymous>: no visible binding for global variable ‘g.cols’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_spatial_adj.R:161-165)
+fb_spatial_adj : <anonymous>: no visible binding for global variable ‘g.layer’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_spatial_adj.R:161-165)
+fb_spatial_adj: no visible binding for global variable ‘trait’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_spatial_adj.R:209-211)
+fb_spatial_adj: no visible binding for global variable ‘value’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_spatial_adj.R:209-211)
+fb_spatial_adj: no visible binding for global variable ‘unique_id’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_spatial_adj.R:209-211)
+fb_spatial_adj: no visible binding for global variable ‘.’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_spatial_adj.R:217-317)
+fb_spatial_adj: no visible binding for global variable ‘.’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_spatial_adj.R:217-317)
+fb_spatial_adj : <anonymous>: no visible binding for global variable ‘value’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_spatial_adj.R:229-231)
+fb_spatial_adj : <anonymous>: no visible binding for global variable ‘g.row’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_spatial_adj.R:237-257)
+fb_spatial_adj : <anonymous>: no visible binding for global variable ‘g.cols’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_spatial_adj.R:237-257)
+fb_spatial_adj : <anonymous>: no visible binding for global variable ‘g.layer’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_spatial_adj.R:237-257)
+fb_spatial_adj : <anonymous>: no visible binding for global variable ‘.’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_spatial_adj.R:240-242)
+fb_spatial_adj : <anonymous>: no visible binding for global variable ‘.’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_spatial_adj.R:240-242)
+fb_spatial_adj : <anonymous>: no visible binding for global variable ‘.’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_spatial_adj.R:240-242)
+fb_spatial_adj : <anonymous>: no visible binding for global variable ‘.’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_spatial_adj.R:244-246)
+fb_spatial_adj : <anonymous>: no visible binding for global variable ‘.’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_spatial_adj.R:244-246)
+fb_spatial_adj : <anonymous>: no visible binding for global variable ‘.’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_spatial_adj.R:248-250)
+fb_spatial_adj : <anonymous>: no visible binding for global variable ‘.’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_spatial_adj.R:252-254)
+fb_spatial_adj : <anonymous>: no visible binding for global variable ‘grid_type’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_spatial_adj.R:261-265)
+fb_spatial_adj : <anonymous>: no visible binding for global variable ‘value’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_spatial_adj.R:261-265)
+fb_spatial_adj : <anonymous>: no visible binding for global variable ‘g.row’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_spatial_adj.R:261-265)
+fb_spatial_adj : <anonymous>: no visible binding for global variable ‘g.cols’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_spatial_adj.R:261-265)
+fb_spatial_adj : <anonymous>: no visible binding for global variable ‘g.layer’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_spatial_adj.R:261-265)
+fb_spatial_adj : <anonymous>: no visible binding for global variable ‘value’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_spatial_adj.R:261-265)
+fb_spatial_adj : <anonymous>: local variable ‘trait_adj’ assigned but may not be used (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_spatial_adj.R:226)
+fb_spatial_adj: no visible binding for global variable ‘.’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_spatial_adj.R:323-370)
+fb_spatial_adj: no visible binding for global variable ‘.’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_spatial_adj.R:323-370)
+fb_spatial_adj : <anonymous>: no visible binding for global variable ‘value’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_spatial_adj.R:335-337)
+fb_spatial_adj : <anonymous>: local variable ‘trait_adj’ assigned but may not be used (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_spatial_adj.R:332)
+fb_spatial_adj: no visible binding for global variable ‘trait’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_spatial_adj.R:379-381)
+fb_spatial_adj: no visible binding for global variable ‘type’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_spatial_adj.R:379-381)
+fb_spatial_adj: no visible binding for global variable ‘value’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_spatial_adj.R:379-381)
+fb_spatial_adj: no visible binding for global variable ‘trait’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_spatial_adj.R:384-389)
+fb_spatial_adj: no visible binding for global variable ‘type’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_spatial_adj.R:384-389)
+fb_spatial_adj: no visible binding for global variable ‘.’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_spatial_adj.R:384-389)
+fb_spatial_adj: no visible binding for global variable ‘.’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_spatial_adj.R:384-389)
+fb_spatial_adj: no visible binding for global variable ‘.’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_spatial_adj.R:384-389)
+fb_spatial_adj: no visible binding for global variable ‘fit’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_spatial_adj.R:384-389)
+fb_spatial_adj: no visible binding for global variable ‘fit’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_spatial_adj.R:384-389)
+fb_spatial_adj: no visible binding for global variable ‘.’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_spatial_adj.R:394-402)
+fb_spatial_adj: no visible binding for global variable ‘.’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_spatial_adj.R:394-402)
+fb_spatial_adj: no visible binding for global variable ‘V_P’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_spatial_adj.R:394-402)
+fb_spatial_adj: no visible binding for global variable ‘type’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_spatial_adj.R:394-402)
+fb_spatial_adj: no visible binding for global variable ‘V_R’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_spatial_adj.R:394-402)
+fb_spatial_adj: no visible binding for global variable ‘unadjusted’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_spatial_adj.R:394-402)
+fb_spatial_adj: no visible binding for global variable ‘adjusted’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_spatial_adj.R:394-402)
+fb_spatial_adj: no visible binding for global variable ‘rel_eff’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_spatial_adj.R:408-413)
+fb_spatial_adj: no visible binding for global variable ‘trait’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_spatial_adj.R:408-413)
+fb_spatial_adj: no visible binding for global variable ‘trait’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_spatial_adj.R:418-422)
+fb_spatial_adj: no visible binding for global variable ‘trait’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_spatial_adj.R:433-440)
+fb_spatial_adj: no visible binding for global variable ‘type’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_spatial_adj.R:433-440)
+fb_spatial_adj: no visible binding for global variable ‘type’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_spatial_adj.R:433-440)
+fb_spatial_adj: no visible binding for global variable ‘trait’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_spatial_adj.R:433-440)
+fb_spatial_adj: no visible binding for global variable ‘value’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_spatial_adj.R:433-440)
+fb_spatial_adj: no visible binding for global variable ‘.’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_spatial_adj.R:433-440)
+fb_spatial_adj: local variable ‘fbt1’ assigned but may not be used (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_spatial_adj.R:206)
+fb_spatial_adj: local variable ‘null’ assigned but may not be used (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_spatial_adj.R:154-156)
+
+
+fb_visualize: no visible binding for global variable ‘trait’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_visualize.R:68-70)
+fb_visualize: no visible binding for global variable ‘value’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_visualize.R:68-70)
+fb_visualize: no visible binding for global variable ‘trait’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_visualize.R:78-79)
+fb_visualize: no visible binding for global variable ‘value’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_visualize.R:78-79)
+fb_visualize: no visible binding for global variable ‘value’ (C:/Users/Jeff/Google Drive/Barley Lab/Projects/Repositories/fbutils/R/fb_visualize.R:85-86)
+
+
 
 
 

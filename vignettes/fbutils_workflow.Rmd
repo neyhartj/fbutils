@@ -23,7 +23,7 @@ library(fbutils)
 ```
 
 ```{r, include=FALSE}
-library(tidyverse)
+library(dplyr)
 ```
 
 ### Definitions

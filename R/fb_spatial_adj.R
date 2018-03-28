@@ -28,13 +28,15 @@
 #' is added to the \code{field.book.table}.
 #' 
 #' @details 
+#' Details to come
 #' 
 #' 
 #' @import mvngGrAd
 #' @import dplyr
-#' @importFrom  tidyr gather
 #' @import stringr
+#' @importFrom  tidyr gather
 #' @importFrom purrr map pmap
+#' @importFrom stats lm var sigma
 #' 
 #' @examples 
 #' data("fbt_sample")
@@ -149,9 +151,11 @@ fb_spatial_adj <- function(fbt, traits, checks, grid.size = NULL, max.grid.size 
       # Make sure grid.size is formatted correctly
       grid.size.components <- c("grid.rows", "grid.cols", "grid.layers")
       
-      null <- lapply(max.grid.size, function(tier) 
+      for (tier in max.grid.size) {
         if (!any(names(tier) %in% grid.size.components))
-          stop("The names of the second layer of 'max.grid.size' do not include grid.rows, grid.col, and grid.layers") )
+          stop("The names of the second layer of 'max.grid.size' do not include 
+               grid.rows, grid.col, and grid.layers")
+      }
       
       # Sort the max.grid.size by trait
       max.grid.size <- max.grid.size[traits]
@@ -188,9 +192,11 @@ fb_spatial_adj <- function(fbt, traits, checks, grid.size = NULL, max.grid.size 
     # Make sure grid.size is formatted correctly
     grid.size.components <- c("grid.rows", "grid.cols", "grid.layers")
     
-    null <- lapply(grid.size, function(tier) 
+    for (tier in grid.size) {
       if (!any(names(tier) %in% grid.size.components))
-        stop("The names of the second layer of 'grid.size' do not include grid.rows, grid.col, and grid.layers") )
+        stop("The names of the second layer of 'max.grid.size' do not include 
+               grid.rows, grid.col, and grid.layers")
+    }
     
     grid.size <- grid.size[traits]
     
@@ -199,9 +205,6 @@ fb_spatial_adj <- function(fbt, traits, checks, grid.size = NULL, max.grid.size 
   
   # Extract line name information
   line_name <- fbt$line_name
-  
-  # Copy the field.book.table
-  fbt1 <- fbt
 
   ## Gather the data in the fbt by trait
   fbt_tidy <- fbt %>% 
@@ -219,9 +222,6 @@ fb_spatial_adj <- function(fbt, traits, checks, grid.size = NULL, max.grid.size 
         
         # Trait name
         trait_i <- unique(fbt_trait$trait)
-        
-        # Create a name for the adjusted trait
-        trait_adj <- str_c(trait_i, "_adj")
       
         # Extract the data
         p_obs <- fbt_trait %>%
@@ -325,9 +325,6 @@ fb_spatial_adj <- function(fbt, traits, checks, grid.size = NULL, max.grid.size 
         
         # Trait name
         trait_i <- unique(fbt_trait$trait)
-        
-        # Create a name for the adjusted trait
-        trait_adj <- str_c(trait_i, "_adj")
         
         # Extract the data
         p_obs <- fbt_trait %>%

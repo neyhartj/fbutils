@@ -41,7 +41,7 @@ functions provided in the \code{\link[mvngGrAd]{mvngGrAd}}
 package.
 }
 \details{
-
+Details to come
 }
 \examples{
 data("fbt_sample")

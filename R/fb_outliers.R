@@ -7,6 +7,7 @@
 #' the mean to use when labelling outliers.
 #' 
 #' @import dplyr
+#' @importFrom stats sd
 #' 
 #' @export
 #' 
@@ -15,7 +16,7 @@ fb_outliers <- function(fbt, traits, max.sd = 3) {
   ### Error check
   # If traits is missing, set to default
   if (missing(traits)) {
-    traits <- fb_traits(x = fbt, "numeric")
+    traits <- fb_traits(fbt = fbt, "numeric")
     
   } else {
     if (!is.character(traits)) stop("'traits' must be character.")

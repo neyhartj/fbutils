@@ -115,8 +115,7 @@ as_field_book_table <- function(fbt, unique.id = "plot_id", row = "row",
     select_(.dots = c(non.traits, traits))
   
   # Remove completely missing columns
-  to.keep <- summarize_all(fbt2, funs(!all(is.na(.)))) %>%
-    as.logical()
+  to.keep <- sapply(fbt2, function(col) !all(is.na(col)))
   
   fbt3 <- fbt2 %>%
     select(which(to.keep))
@@ -134,6 +133,7 @@ as_field_book_table <- function(fbt, unique.id = "plot_id", row = "row",
 #' 
 #' @import dplyr
 #' @import stringr
+#' @importFrom utils read.csv
 #' 
 #' @export
 #' 
