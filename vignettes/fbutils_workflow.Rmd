@@ -1,0 +1,285 @@
+---
+title: "Example Workflow With `fbutils`"
+author: "Jeff Neyhart^[Department of Agronomy and Plant Genetics, University of Minnesota, St. Paul, Minnesota]"
+output: html_document
+vignette: >
+  %\VignetteIndexEntry{Example Workflow With fbutils}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+```
+
+## Introduction
+
+The `fbutils` package was written for simple data management of plant breeding trials, and as a complimentary package to the Field Book Android App. This package includes functions for data reading, visualization, outlier detection, and spatial adjustment. This document provides an example workflow for managing data in the Field Book Table format.
+
+As with any other package, use the following code to load the `fbutils` package:
+
+```{r}
+library(fbutils)
+```
+
+```{r, include=FALSE}
+library(tidyverse)
+```
+
+### Definitions
+
+It may be helpful to first define some terms that will be used throughout this vignette. Here is a table of some common terms and their meaning:
+
+Term            | Definition
+----------------|------------
+line / genotype | an entry in an experiment
+trial           | a single experiment in which many lines are evaluated
+plot            | a single space in which a single line is grown
+row             | a series of plots arranged across columns
+column          | a series of plots arranged across rows
+
+
+### Functions
+
+Most of the functions in the `fbutils` package begin with "`fb_`" to identify them as part of the package. Below is a list of the available functions (subject to change) and their purpose:
+
+Function                | Purpose
+------------------------|------------
+`as_field_book_table()` | Convert a `data.frame` to a `fbt`-formatted data.frame
+`fb_heatmap()`          | Visualize observations spatially using a heatmap
+`fb_outliers()`         | Identify outliers
+`fb_parse()`            | Parse multi-categorical traits
+`fb_set_missing()`      | Set observations as NA according to the unique ID
+`fb_spatial_adj()`      | Perform spatial adjustment of observations using a moving grid
+`fb_traits()`           | List the traits in a `fbt` data.frame
+`fb_visualize()`        | Visualize the distribution of traits
+`read_fb()`             | Read in a `.csv` and convert to a `fbt`-formatted data.frame
+
+
+
+
+## The `fbt` Format
+
+I will refer to the output from the Field Book App as the Field Book Table, or `fbt`, format. Within the R environment, you can treat a `fbt` object as a `data.frame`. The input tables for the Field Book App require three columns: unique ID, row, and column. However, additional information may be included, such as line (or genotype) name, block, rep, etc. Whatever extra columns are in the input file that is used in the Field Book App will also be included in the output file.
+
+For the `fbutils` package, four columns are required: `unique_id`, `row`, `column`, and `line_name`. The `unique_id` variable is a unique identifier for a plot within a trial. The `row` variable is an integer identifier of the trial row, and the `column` variable is an integer identifier of the trial column. The `line_name` variable is a character vector of identifiers for the lines included in the trial.
+
+> Note, the `fbt` format is not a defined object class. To make the `fbt`-formatted data.frame more amenable to manipulation by function in the `dplyr` or `tidyr` packages, we could not use the class attribute.
+
+Here is an example of a `data.frame` in `fbt` format:
+
+```{r}
+data("fbt_sample")
+head(fbt_sample)
+```
+
+You may notice that some column names are in lowercase and some columns are in title case (i.e. the first letter is capitalized). Columns in lowercase are considered metadata in all `fbutils` functions, while columns in title case
+are considered traits in all functions. For instance, in this `fbt` data, the columns `Continuous`, `Discrete`, and `Multi` are all trait names. 
+
+The `fbt` format is highly compatible with functions in [`tidyverse`](https://www.tidyverse.org/) packages (e.g. [`dplyr`](http://dplyr.tidyverse.org/) or [`tidyr`](http://tidyr.tidyverse.org/)). For instance, columns can be removed using the `dplyr` function `select()`:
+
+```{r}
+# Remove all columns between 'tray_row' and 'seed_id'
+fbt_sample %>%
+  select(-tray_row:-seed_id)
+```
+
+Or columns could be maniputated using the function `mutate()`:
+
+```{r}
+# Add 2 to each element in the 'Discrete' trait
+fbt_sample %>%
+  mutate(Discrete_new = Discrete + 2)
+```
+
+
+
+
+## Importing Data
+
+Data may be read-in using the `read_fb` function, as such:
+
+```{r, eval=FALSE}
+read_fb(file = "field_book_table.csv")
+```
+
+By default, `read_fb` makes some assumptions about the names of some columns. Refer to the documentation (i.e. `?read_fb`) for more information. This function is a wrapper around the function `as_field_book_table`, which can convert any `data.frame` into the `fbt` format. I will demonstrate this function using the example data.
+
+```{r}
+fbt <- as_field_book_table(
+  fbt_sample, unique.id = "unique_id", 
+  other.cols = c("plot", "tray_row", "tray_id", "seed_id", "pedigree")
+  )
+```
+
+Like the `fbt` format, the `as_field_book_table` function requires four metadata columns. If other metadata columns are present, but you do not specify them using the `other.cols` argument, those columns will be considered traits. For example, look what happens when the 'other.cols` argument is not used.
+
+```{r}
+as_field_book_table(fbt_sample, unique.id = "unique_id") %>%
+  head()
+```
+
+Here, metadata columns like `plot` and `tray_row` are now in title case, and thus will be treated as traits. Not good!
+
+
+
+
+## Identify Traits
+
+Once data in imported in to the `fbt` format, it can be helpful to pull-out the trait names. A simple function, `fb_traits` can do this:
+
+```{r}
+fb_traits(fbt = fbt_sample)
+```
+
+By default, `fb_traits` identifies all the traits in the `fbt` object, however
+one can specify `numeric` or `character` traits with an additional argument.
+
+```{r}
+fb_traits(fbt = fbt_sample, mode = "numeric")
+```
+
+
+
+
+## Visualization
+
+### Distributions
+
+One of the first things to do with raw data is to visualize it. The `fb_visualize()` function provides a quick way to glimpse the distribution of data. By default, only numeric traits are plotted.
+
+```{r, fig.width=5, fig.align='center'}
+fb_visualize(fbt_sample)
+```
+
+The default plot type is a boxplot, however a histogram can be plotted, too.
+
+```{r, fig.width=5, fig.align='center'}
+fb_visualize(fbt_sample, graph = "histogram")
+```
+
+### Heatmap
+
+A very useful feature of the `fbutils` package is the ability to visualize observations spatially via a heatmap. This allows us to observe the spatial trends in the data.
+
+```{r, fig.width=5, fig.align='center'}
+fb_heatmap(fbt_sample)
+```
+
+The `Continuous` trait displays the desirable spatial distribution - random. We can also clearly visualize the single outlier in the `OneOutlier` trait, as well as the very apparent spatial pattern the `SpatialGradient` trait.
+
+
+
+
+## Data Manipulation
+
+### Parsing Multi-Categorical Traits
+
+This package assumes that the values of the observations for each trait are in the intended units. However, the Field Book App allows for other types of trait, such as multi-categorical. For instance, disease readings may include multiple observations on a single plot. With the Multi-Categorical trait option, these observations can be stored as several values deliminated by a special character.
+
+There are some functions in the package to handle this type of information. Let us look at the `Multi` trait in the example `fbt` object:
+
+```{r}
+fbt_sample %>%
+  select(Multi) %>%
+  head()
+```
+
+Each of the elements in this column is 10 observations from a plot The `fb_parse()` function converts these observations into individual columns, plus calculates the mean and standard deviation. Here we parse those observations and display the first four columns and any columns starting with `Multi`.
+
+```{r}
+fb_parse(fbt_sample, traits = "Multi", sep = ":", n.obs = 10) %>%
+  select(1:4, starts_with("Multi")) %>%
+  head()
+```
+
+The `fb_parse()` function successfully separates each individual observation into a separate trait.
+
+### Detecting Outliers
+
+An important step in data processing is detecting and removing outliers. The `fb_outliers()` function performs simple outlier detection based on observations that fall outside of a set distribution. For instance, this function may be used to detect outliers that are more than 3 standard deviations from the mean. Here I demonstrate on a trait that was purposefully created to have a single outlier:
+
+```{r}
+outliers <- fb_outliers(fbt_sample, traits = "OneOutlier", max.sd = 3)
+```
+
+The outlier summary provides information to examine the observation and determine, perhaps subjectively, if the observations should be kept.
+
+### Set Values to Missing
+
+Sometimes it is useful to set some obervation to missing (i.e. NA), such as in the case of an outlier or otherwise undesirable observation. The `fb_set_missing()` function can set observations to missing given the `unique_id` of that observation and the desired trait. Note that unless otherwise specified, this function will set missing all trait observations for a particular unique id.
+
+Here, we remove the outlier that was detected before and then display the first four columns and the column of the trait:
+
+```{r}
+fb_set_missing(fbt_sample, traits = "OneOutlier", unique_ids = "13RPN00010") %>%
+  select(1:4, OneOutlier) %>%
+  head()
+```
+
+
+
+
+## Spatial Adjustment
+
+Spatial adjustment is another important step in processing field-based data. Often, fields have some level of spatial variability, such as a topographic slope, soil variability, or some other attribute that impacts the observed phenotype in some pattern. These spatial patterns contribute to the non-genetic noise ($V_R$) that makes up the observed phenotypes. By reducing this noise, the proportion of the variation in observed phenotypes that is due to genetic variation increases as per the equation for heritability: 
+
+$$H = \frac{V_G}{(V_G + V_R)}$$. 
+
+A suitable method of performing spatial adjustment (regardless of the trial design) is a moving average. The `fbutils` package implements the moving average procedure developed in the [`mvngGrAd`](https://cran.r-project.org/web/packages/mvngGrAd/index.html) package. The `fb_spatial_adj()` function will perform this moving average adjustment for traits. Using checks to measure the within-environment variance ($V_R$), the function determines whether spatial adjustment, in fact, reduced this variation. If so, the adjusted values are retained, but if not, the raw values are retained.
+
+The `fb_spatial_adj` function can be run by providing moving average grid dimensions (see the [`mvngGrAd` package vignette] (https://cran.r-project.org/web/packages/mvngGrAd/mvngGrAd.pdf) for more information).
+
+For instance, the `SpatialGradient` trait could be adjusted using a grid of 4 columns, 2 rows, and 2 layers (i.e. diagonals):
+
+```{r}
+checks <- c("Kharkof", "TAM 107", "Scout 66", "Trego", "NW04Y2188")
+
+fbt_adjusted <- fb_spatial_adj(fbt_sample, "SpatialGradient", checks,
+                               grid.size = list(
+                                 SpatialGradient = list(
+                                   grid.rows = 2,
+                                   grid.cols = 4,
+                                   grid.layers = 2)) )
+
+```
+
+
+The output from `fb_spatial_adj()` function includes a summary of the adjustment performance. `V_P` is the variance among all observations, `V_R` is the residual variance (calculated using the checks), and `rel_eff` is the relative efficiency. This last value determines if spatial adjustment was useful. A relative efficiency above 1 indicates that `V_R` was lowered in the adjusted observations compared to the unadjusted observations, while a relative efficiency below 1 indicates that `V_R` increased as a result of spatial adjustment.
+
+```{r}
+fbt_adjusted$summary
+```
+
+We can readily see the impact of spatial adjustment by plotting the adjusted observations using a heatmap:
+
+```{r, fig.width=5}
+# Unadjusted
+fb_heatmap(fbt_sample, traits = "SpatialGradient")
+# Adjusted
+fb_heatmap(fbt_adjusted$fbt.adj, traits = "SpatialGradient")
+```
+
+If the `grid.size` argument is not provided, the function will optimize the dimensions before performing spatial adjustment. The following code would trigger grid size optimization, however this procedure does take some time, so the output is not shown.
+
+```{r, eval=FALSE}
+fbt_adjusted <- fb_spatial_adj(fbt_sample, "SpatialGradient", checks)
+```
+
+After spatial adjustment, you can extract the new `fbt`-formatted data.frame from the output:
+
+```{r}
+fbt <- fbt_adjusted$fbt.adj
+```
+
+
+
+
+## Writing Data
+
+Since the `fbt` data.frame is still a data.frame, writing the data to a file simply uses existing `R` functions, ideally `write.csv()`.
+
+```{r, eval=FALSE}
+# Write the data
+write.csv(x = fbt, file = "processed_field_book.csv", row.names = FALSE)
+```
