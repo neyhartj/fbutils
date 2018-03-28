@@ -15,13 +15,13 @@
 #' \code{\link[ggplot2]{facet_wrap}}.
 #' 
 #' @examples 
-#' data("fbt.sample")
+#' data("fbt_sample")
 #' 
 #' # For boxplots
-#' fb_visualize(fbt = fbt.sample)
+#' fb_visualize(fbt = fbt_sample)
 #' 
 #' # For histograms
-#' fb_visualize(fbt = fbt.sample, graph = "histogram")
+#' fb_visualize(fbt = fbt_sample, graph = "histogram")
 #' 
 #' 
 #' @import ggplot2

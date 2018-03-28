@@ -6,6 +6,19 @@
 \usage{
 grid_cor(p_obs, rows, cols, grid.rows, grid.cols, layers)
 }
+\arguments{
+\item{p_obs}{The phenotypic observations}
+
+\item{rows}{Number of field rows}
+
+\item{cols}{Number of field columns}
+
+\item{grid.rows}{Number of grid rows}
+
+\item{grid.cols}{Number of grid columns}
+
+\item{layers}{Number of grid layers}
+}
 \description{
 Convenience functions not generally to be called by the user.
 }

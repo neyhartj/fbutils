@@ -15,7 +15,6 @@
 #' standard deviation of all datapoint entries are also included.
 #' 
 #' @import dplyr
-#' @importFrom purrrlyr by_row
 #' @import stringr
 #' @import tidyr
 #' 
@@ -54,12 +53,14 @@ fb_parse <- function(fbt, traits, sep = ":", n.obs = 10) {
       convert = TRUE, extra = "drop", fill = "right")
     
     # Calculate mean and sd
-    fbt.sub1 <- fbt.sub %>% 
-      by_row(function(x) c(mean(unlist(x)), sd(unlist(x))), .collate = "cols")
+    fbt.sub.stat <- apply(X = fbt.sub, MARGIN = 1, 
+                          FUN = function(row) c(mean = mean(row), sd = sd(row))) %>% 
+      t() %>%
+      as.data.frame()
     
-    # Rename
-    names(fbt.sub1) <- names(fbt.sub1) %>% 
-      str_replace_all(c(".out1" = str_c(trait, "_mean"), ".out2" = str_c(trait, "_sd")))
+    names(fbt.sub.stat) <- paste(trait, names(fbt.sub.stat), sep = "_")
+    
+    fbt.sub1 <- bind_cols(fbt.sub, fbt.sub.stat)
     
     # Return
     return(fbt.sub1) })

@@ -46,6 +46,15 @@ package.
 \examples{
 data("fbt_sample")
 
+# Specify a grid size
+grid.size <- list(SpatialGradient = list(grid.rows = 5, grid.cols = 5, grid.layers = 5))
+
+adj_out <- fb_spatial_adj(fbt = fbt_sample, traits = "SpatialGradient", 
+                          checks = c("Kharkof", "TAM 107", "Scout 66"), 
+                          grid.size = grid.size)                         
+                          
+\dontrun{
+
 # Run spatial adjustment without conditions
 adj_out <- fb_spatial_adj(fbt = fbt_sample, traits = "SpatialGradient", 
                           checks = c("Kharkof", "TAM 107", "Scout 66"))
@@ -60,13 +69,7 @@ max.grid.size <- list(SpatialGradient = list(grid.rows = 5, grid.cols = 5, grid.
 adj_out <- fb_spatial_adj(fbt = fbt_sample, traits = "SpatialGradient", 
                           checks = c("Kharkof", "TAM 107", "Scout 66"), 
                           max.grid.size = max.grid.size)
-                          
-# Specify a grid size
-grid.size <- list(SpatialGradient = list(grid.rows = 5, grid.cols = 5, grid.layers = 5))
-
-adj_out <- fb_spatial_adj(fbt = fbt_sample, traits = "SpatialGradient", 
-                          checks = c("Kharkof", "TAM 107", "Scout 66"), 
-                          grid.size = grid.size)                         
-                          
+   
+}                       
 
 }

@@ -3,6 +3,13 @@
 #' @description 
 #' Convenience functions not generally to be called by the user.
 #' 
+#' @param p_obs The phenotypic observations
+#' @param rows Number of field rows
+#' @param cols Number of field columns
+#' @param grid.rows Number of grid rows
+#' @param grid.cols Number of grid columns
+#' @param layers Number of grid layers
+#' 
 #' @importFrom mvngGrAd movingGrid
 #' 
 grid_cor <- function(p_obs, rows, cols, grid.rows, grid.cols, layers) {

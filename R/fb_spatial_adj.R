@@ -39,6 +39,15 @@
 #' @examples 
 #' data("fbt_sample")
 #' 
+#' # Specify a grid size
+#' grid.size <- list(SpatialGradient = list(grid.rows = 5, grid.cols = 5, grid.layers = 5))
+#' 
+#' adj_out <- fb_spatial_adj(fbt = fbt_sample, traits = "SpatialGradient", 
+#'                           checks = c("Kharkof", "TAM 107", "Scout 66"), 
+#'                           grid.size = grid.size)                         
+#'                           
+#' \dontrun{
+#' 
 #' # Run spatial adjustment without conditions
 #' adj_out <- fb_spatial_adj(fbt = fbt_sample, traits = "SpatialGradient", 
 #'                           checks = c("Kharkof", "TAM 107", "Scout 66"))
@@ -53,14 +62,8 @@
 #' adj_out <- fb_spatial_adj(fbt = fbt_sample, traits = "SpatialGradient", 
 #'                           checks = c("Kharkof", "TAM 107", "Scout 66"), 
 #'                           max.grid.size = max.grid.size)
-#'                           
-#' # Specify a grid size
-#' grid.size <- list(SpatialGradient = list(grid.rows = 5, grid.cols = 5, grid.layers = 5))
-#' 
-#' adj_out <- fb_spatial_adj(fbt = fbt_sample, traits = "SpatialGradient", 
-#'                           checks = c("Kharkof", "TAM 107", "Scout 66"), 
-#'                           grid.size = grid.size)                         
-#'                           
+#'    
+#' }                       
 #' 
 #' @export
 #' 
@@ -232,19 +235,19 @@ fb_spatial_adj <- function(fbt, traits, checks, grid.size = NULL, max.grid.size 
         grids_cor <- gr_list %>%
           group_by(g.row, g.cols, g.layer) %>% 
           do({
-            full_grid <- fbutils:::grid_cor(p_obs = p_obs, rows = rows, cols = cols, 
+            full_grid <- grid_cor(p_obs = p_obs, rows = rows, cols = cols, 
                                   grid.rows = seq(.$g.row), grid.cols = seq(.$g.cols), 
                                   layers = seq(.$g.layer) ) 
             
-            no_layers <- fbutils:::grid_cor(p_obs = p_obs, rows = rows, cols = cols, 
+            no_layers <- grid_cor(p_obs = p_obs, rows = rows, cols = cols, 
                                   grid.rows = seq(.$g.row), grid.cols = seq(.$g.cols), 
                                   layers = NULL )
             
-            only_cols <- fbutils:::grid_cor(p_obs = p_obs, rows = rows, cols = cols, 
+            only_cols <- grid_cor(p_obs = p_obs, rows = rows, cols = cols, 
                                   grid.rows = NULL, grid.cols = seq(.$g.cols), 
                                   layers = NULL )
             
-            only_rows <- fbutils:::grid_cor(p_obs = p_obs, rows = rows, cols = cols, 
+            only_rows <- grid_cor(p_obs = p_obs, rows = rows, cols = cols, 
                                   grid.rows = seq(.$g.row), grid.cols = NULL, 
                                   layers = NULL )
             
