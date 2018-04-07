@@ -248,7 +248,7 @@ fbt_adjusted <- fb_spatial_adj(fbt_sample, "SpatialGradient", checks,
 The output from `fb_spatial_adj()` function includes a summary of the adjustment performance. `V_P` is the variance among all observations, `V_R` is the residual variance (calculated using the checks), and `rel_eff` is the relative efficiency. This last value determines if spatial adjustment was useful. A relative efficiency above 1 indicates that `V_R` was lowered in the adjusted observations compared to the unadjusted observations, while a relative efficiency below 1 indicates that `V_R` increased as a result of spatial adjustment.
 
 ```{r}
-fbt_adjusted$summary
+fbt_adjusted$summary$adjustment_summary
 ```
 
 We can readily see the impact of spatial adjustment by plotting the adjusted observations using a heatmap:
@@ -257,7 +257,7 @@ We can readily see the impact of spatial adjustment by plotting the adjusted obs
 # Unadjusted
 fb_heatmap(fbt_sample, traits = "SpatialGradient")
 # Adjusted
-fb_heatmap(fbt_adjusted$fbt.adj, traits = "SpatialGradient")
+fb_heatmap(fbt_adjusted$fbt, traits = "SpatialGradient")
 ```
 
 If the `grid.size` argument is not provided, the function will optimize the dimensions before performing spatial adjustment. The following code would trigger grid size optimization, however this procedure does take some time, so the output is not shown.
@@ -269,7 +269,7 @@ fbt_adjusted <- fb_spatial_adj(fbt_sample, "SpatialGradient", checks)
 After spatial adjustment, you can extract the new `fbt`-formatted data.frame from the output:
 
 ```{r}
-fbt <- fbt_adjusted$fbt.adj
+fbt <- fbt_adjusted$fbt
 ```
 
 

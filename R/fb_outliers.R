@@ -39,66 +39,55 @@ fb_outliers <- function(fbt, traits, max.sd = 3) {
     stop(paste(c(traits[!traits %in% num.traits], 
                  " is/are not among the numeric variables in the field.book.table.")))
                  
-  # Pull out the data on those traits
-  trait.data <- fbt %>%
-    select(which(names(.) %in% c("unique_id", "row", "column", "line_name", traits))) %>%
-    gather(trait, value, -unique_id:-line_name)
+  # Create an empty list for the outlier summary
+  outlier_summary <- list()
   
-  # Summarize
-  trait.summary <- trait.data %>% 
-    group_by(trait) %>% 
-    summarize(mean = mean(value, na.rm = TRUE),
-              sd = sd(value, na.rm = TRUE),
-              n_NA = sum(is.na(value))) %>% 
-    mutate(upper_bound = mean + (sd * max.sd), 
-           lower_bound = mean - (sd * max.sd))
-  
-  # Join
-  trait.data1 <- trait.data %>%
-    full_join(trait.summary, by = "trait")
-  
-  # Detect outliers for each trait
-  trait.outliers <- trait.data1 %>% 
-    mutate(is_outlier = value < lower_bound | value > upper_bound)
-  
-  ## Put together an outlier summary
-  outlier.summary <- trait.outliers %>% 
-    filter(is_outlier) %>%
-    select(unique_id:value)
-  
-  ## Trait summary
-  trait.summary1 <- trait.summary %>%
-    full_join(trait.outliers %>% 
-                group_by(trait) %>% 
-                summarize(n_outlier = sum(is_outlier, na.rm = TRUE)),
-              by = "trait")
-
-  # Print the outlier summary
+  # Iterate over traits
   for (tr in traits) {
     
-    # Subset the summary
-    tr.summary <- trait.summary1 %>%
-      filter(trait %in% tr)
+    # Pull out the data on those traits
+    tr_values <- as.vector(fbt[[tr]])
+    
+    # Calculate summaries
+    tr_mean <- mean(tr_values, na.rm = TRUE)
+    tr_sd <- sd(tr_values, na.rm = TRUE)
+    n_NA <- sum(is.na(tr_values))
+    
+    # Calculate upper and lower bounds
+    upper_bound <- tr_mean + (tr_sd * max.sd)
+    lower_bound <- tr_mean - (tr_sd * max.sd)
+    
+    ## Detect outliers
+    is_outlier <- tr_values < lower_bound | tr_values > upper_bound
+    
+    # Subset the data for those outliers
+    fbt_trait <- fbt[,names(fbt) %in% c("unique_id", "row", "column", "line_name", tr)]
+    fbt_outliers <- as.data.frame(fbt_trait[is_outlier,,drop = FALSE])
     
     # Notify user
     cat("\n\nOutlier summary for trait: ", tr)
-    cat("\nSample mean:", tr.summary$mean)
-    cat("\nSample standard deviation: ", tr.summary$sd)
-    cat("\nUpper bouund: ", tr.summary$upper_bound)
-    cat("\nLower bound: ", tr.summary$lower_bound, "\n\n")
+    cat("\nSample mean:", tr_mean)
+    cat("\nSample standard deviation: ", tr_sd)
+    cat("\nNumber of missing data points: ", n_NA)
+    cat("\nUpper bouund: ", upper_bound)
+    cat("\nLower bound: ", lower_bound, "\n\n")
     
     # Print if outliers
-    if (tr.summary$n_outlier > 0) {
-      print(outlier.summary %>% filter(trait %in% tr) %>% as.data.frame())
+    if (nrow(fbt_outliers) > 0) {
+      print(fbt_outliers)
       
     } else {
       cat("No outliers detected.")
-    
+      
     }
-  }
+    
+    ## Add the outliers to the list
+    outlier_summary[[tr]] <- fbt_outliers
+    
+  } # Close the loop
 
   # Return the data
-  return(outlier.summary)
+  return(outlier_summary)
 
 } # Close the function
   

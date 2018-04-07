@@ -38,40 +38,41 @@ fb_parse <- function(fbt, traits, sep = ":", n.obs = 10) {
   # Make sure the traits are in the fbt
   if (any(!traits %in% fbt.traits))
     stop(paste(c(traits[!traits %in% fbt.traits], 
-                 " is/are not among the numeric variables in the input x")))
+                 " is/are not among the numeric variables in the input fbt")))
                  
   
   
   # Iterate over trait columns
-  parsed.data <- lapply(X = traits, FUN = function(trait) {
+  parsed.data <- lapply(X = traits, FUN = function(tr) {
     
     # Subset the fbt for the trait
-    fbt.sub <- fbt %>%
-      select_(trait) %>%
-      # Use separate to parse
-      separate_(col = trait, into = str_c(trait, seq(n.obs)), sep = sep,
-      convert = TRUE, extra = "drop", fill = "right")
+    fbt_tr <- fbt[[tr]]
+    
+    # Use strsplit to parse
+    tr_split <- strsplit(x = fbt_tr, split = sep)
+    # Iterate over the list elements and make sure that n.obs are present. If not,
+    # pad with NA
+    tr_split1 <- lapply(X = tr_split, FUN = `length<-`, n.obs)
+    # Convert to numeric
+    tr_split2 <- lapply(X = tr_split1, FUN = as.numeric)
+    
+    # Bind rows
+    tr_matrix <- do.call("rbind", tr_split2)
     
     # Calculate mean and sd
-    fbt.sub.stat <- apply(X = fbt.sub, MARGIN = 1, 
-                          FUN = function(row) c(mean = mean(row), sd = sd(row))) %>% 
-      t() %>%
-      as.data.frame()
+    tr_summary <- apply(X = tr_matrix, MARGIN = 1, 
+                        FUN = function(row) c(mean = mean(row), sd = sd(row)))
     
-    names(fbt.sub.stat) <- paste(trait, names(fbt.sub.stat), sep = "_")
-    
-    fbt.sub1 <- bind_cols(fbt.sub, fbt.sub.stat)
+    # Combine the split values and the summary
+    tr_df <- as.data.frame(cbind(tr_matrix, t(tr_summary)))
+    # Rename
+    names(tr_df) <- c(paste(tr, paste("Obs", seq(n.obs), sep = ""), sep = "_"),
+                      paste(tr, c("mean", "sd"), sep = "_"))
     
     # Return
-    return(fbt.sub1) })
-  
-  # Rbind the list
-  parsed.data1 <- parsed.data %>%
-    bind_cols()
-  
+    return(tr_df) })
+
   # Assemble new data.frame and return it
-  fbt %>%
-    select(which(!colnames(.) %in% traits)) %>%
-    bind_cols(., parsed.data1)
+  bind_cols(fbt[,!names(fbt) %in% traits], bind_cols(parsed.data))
 
 } # Close the function

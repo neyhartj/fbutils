@@ -13,7 +13,6 @@ Imports:
     dplyr,
     ggplot2,
     mvngGrAd,
-    pbapply,
     purrr,
     stringr,
     tidyr

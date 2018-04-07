@@ -33,10 +33,9 @@
 #' 
 #' @import mvngGrAd
 #' @import dplyr
-#' @import stringr
 #' @importFrom  tidyr gather
-#' @importFrom purrr map pmap
-#' @importFrom stats lm var sigma
+#' @importFrom purrr map pmap transpose
+#' @importFrom stats lm var sigma setNames
 #' 
 #' @examples 
 #' data("fbt_sample")
@@ -91,14 +90,13 @@ fb_spatial_adj <- function(fbt, traits, checks, grid.size = NULL, max.grid.size 
   
   # Make sure the specified traits are in the field.book.table
   if (any(!traits %in% num.traits))
-    stop(str_c(str_c(traits[!traits %in% num.traits], collapse = " "), 
-               " is/are not among the numeric variables in x."))
+    stop(paste(c(traits[!traits %in% num.traits], 
+                 " is/are not among the numeric variables in the input fbt")))
   
   # Make sure the specified checks are in the fbt
   if (any(!checks %in% fbt$line_name))
-    stop(str_c(str_c(checks[!checks %in% fbt$line_name], collapse = " "), 
-               " is/are not among the line names in x."))
-  
+    stop(paste(c(checks[!checks %in% fbt$line_name], 
+                 " is/are not among the line names in input fbt")))
   
   # Extract row and column information
   rows <- fbt$row
@@ -107,7 +105,7 @@ fb_spatial_adj <- function(fbt, traits, checks, grid.size = NULL, max.grid.size 
   # If grid.size is NULL, set grid opt to TRUE
   if (is.null(grid.size)) {
     
-    grid.opt = TRUE
+    grid.opt <- TRUE
     
     # There are four steps
     ## 1. Optimize with the full grid (including layers)
@@ -123,15 +121,14 @@ fb_spatial_adj <- function(fbt, traits, checks, grid.size = NULL, max.grid.size 
     long <- seq(max(rows) - 1)
     
     grids <- data.frame(g.row = rep(long, each = length(lat)),
-                        g.cols = rep(lat, length(long)) ) %>%
-      # Add layers
-      rowwise() %>% 
-      mutate(g.layer = min(g.row, g.cols)) %>%
-      ungroup()
+                        g.cols = rep(lat, length(long))) 
+    # Add layers
+    grids$g.layer <- pmin(grids$g.row, grids$g.cols)
+    
     
     # Create a list of grids of length n_trait
     grid_list <- rep(list(grids), length(traits)) %>%
-      structure(names = traits)
+      setNames(nm = traits)
     
     # If max.grid.size is passed, use that information to restrict the grid sizes
     if (!is.null(max.grid.size)) {
@@ -159,12 +156,17 @@ fb_spatial_adj <- function(fbt, traits, checks, grid.size = NULL, max.grid.size 
       
       # Sort the max.grid.size by trait
       max.grid.size <- max.grid.size[traits]
+      
+      # Determine the grid sizes that are less than the max grid size
+      
     
       grid_list_use <- list(grid_list, max.grid.size) %>% 
-        pmap(function(gr, max.gr) 
-          filter(gr, g.row <= max.gr$grid.rows, 
-                 g.cols <= max.gr$grid.cols, 
-                 g.layer <= max.gr$grid.layers))
+        pmap(function(gr, max.gr) {
+          grids_tokeep <- (gr$g.row <= max.gr$grid.rows & gr$g.cols <= max.gr$grid.cols & 
+                             gr$g.layer <= max.gr$grid.layers)
+          gr[grids_tokeep,,drop = FALSE]
+          
+        })
       
     } else {
       grid_list_use <- grid_list
@@ -176,7 +178,7 @@ fb_spatial_adj <- function(fbt, traits, checks, grid.size = NULL, max.grid.size 
     ## grid components are present
   } else { 
     
-    grid.opt = FALSE
+    grid.opt <- FALSE
     
     # Make sure it is of correct class
     if (!is.list(grid.size)) stop("'grid.size' must be a list.")
@@ -205,251 +207,160 @@ fb_spatial_adj <- function(fbt, traits, checks, grid.size = NULL, max.grid.size 
   
   # Extract line name information
   line_name <- fbt$line_name
+  
+  # Create an empty list to store the grid size and the moving average results
+  trait_adjusted <- list()
+  
+  # Iterate over traits
+  for (tr in traits) {
+    
+    # Subset the fbt object for the particular trait
+    fbt_sub <- fbt[,c("unique_id", "row", "column", "line_name", tr)]
+    # Extract the obervations
+    p_obs <- as.vector(fbt_sub[[tr]])
+  
+    # Proceed with optimiztion if called
+    if (grid.opt) {
+      
+      # Notify
+      cat("\n\nOptimizing grid size for trait: ", tr, "\n")
+      
+      # Apply a function over the grids
+      grids_cor <- apply(X = grid_list_use[[tr]], MARGIN = 1, FUN = function(i) {
+        full_grid <- grid_cor(p_obs = p_obs, rows = rows, cols = cols, 
+                              grid.rows = seq(i[1]), grid.cols = seq(i[2]), 
+                              layers = seq(i[3]) )
+        
+        no_layers <- grid_cor(p_obs = p_obs, rows = rows, cols = cols, 
+                              grid.rows = seq(i[1]), grid.cols = seq(i[2]), 
+                              layers = NULL )
+        
+        only_cols <- grid_cor(p_obs = p_obs, rows = rows, cols = cols, 
+                              grid.rows = NULL, grid.cols = seq(i[2]), 
+                              layers = NULL )
+        
+        only_rows <- grid_cor(p_obs = p_obs, rows = rows, cols = cols, 
+                              grid.rows = seq(i[1]), grid.cols = NULL, 
+                              layers = NULL )
+        
+        data.frame(full_grid, no_layers, only_cols, only_rows)
+        
+      }) %>% bind_rows()
+      
+      
+      ## Determine which grid scheme is optimial
+      # Find the maximum correlation for each grid type
+      opt_grid <- which.max(sapply(X = grids_cor, FUN = max))
+      # What type of grid
+      opt_grid_type <- names(grids_cor)[opt_grid]
+      # Extract that grid
+      grid_opt <- grid_list_use[[tr]][which.max(grids_cor[,opt_grid]),]
+      
+      
+      # Depending on which grid scenario prevailed, set the optimal grid
+      ## sizes for the moving average
+      if (opt_grid_type == "full_grid") {
+        grid.rows <- seq_len(grid_opt$g.row)
+        grid.cols <- seq_len(grid_opt$g.cols)
+        grid.layers <- seq_len(grid_opt$g.layer)
+        
+      } else if (opt_grid_type == "no_layers") {
+        grid.rows <- seq_len(grid_opt$g.row)
+        grid.cols <- seq_len(grid_opt$g.cols)
+        grid.layers <- NULL
+        
+      } else if (opt_grid_type == "only_cols") {
+        grid.rows <- NULL
+        grid.cols <- seq_len(grid_opt$g.cols)
+        grid.layers <- NULL
+        
+      } else if (opt_grid_type == "only_rows") {
+        grid.rows <- seq_len(grid_opt$g.row)
+        grid.cols <- NULL
+        grid.layers <- NULL
+      }
+      
+    # If grid optimization is not specified, proceed with the moving
+    # average adjustment only
+    } else {
+      grid.rows <- grid.size[[tr]]$grid.rows
+      grid.cols <- grid.size[[tr]]$grid.cols
+      grid.layers <- grid.size[[tr]]$grid.layers
+      
+    }
+    
+    # Run the moving grid and Return the results
+    mv.out <- movingGrid(rows = rows, columns = cols, obsPhe = p_obs,
+                         shapeCross = list(
+                           grid.rows,
+                           grid.rows,
+                           grid.cols,
+                           grid.cols ),
+                         layers = grid.layers, excludeCenter = TRUE)
+    
+    p_adj <- as.vector(fitted(mv.out))
+    
+    ## Add the original and adjusted data to the fbt data.frame
+    fbt_adj <- cbind(fbt_sub, unadjusted = p_obs, adjusted = p_adj)
+    
+    # Measure residual variance by fitting a linear model with just the
+    # checks
+    p_obs_fit <- lm(unadjusted ~ line_name, data = fbt_adj, subset = line_name %in% checks)
+    V_R_p_obs <- sigma(p_obs_fit)^2
+    
+    p_adj_fit <- lm(adjusted ~ line_name, data = fbt_adj, subset = line_name %in% checks)
+    V_R_p_adj <- sigma(p_adj_fit)^2
+    
+    # Calculate the relative efficiency
+    # The relative efficiency is greater than 1 when the unadjusted V_R is greater
+    # than the adjusted V_R (good) and is less than 1 when the unadjusted V_R is less
+    # than the adjusted V_R (bad)
+    rel_eff <- V_R_p_obs / V_R_p_adj
+    
+    # Determine which vector of data to return based on relative efficiency 
+    # (if specified)
+    if (use.rel.eff) {
+      
+      # Only use the adjusted values if it improves the V_R (if it's the same,
+      # use the original observations)
+      if (rel_eff > 1) {
+        fbt[[tr]] <- p_adj
+        use_p_adj <- TRUE
+        
+      } else {
+        fbt[[tr]] <- p_obs
+        use_p_adj <- FALSE
+      }
+        
+    # If the relative efficiency is not used, return the adjusted value
+    } else {
+      fbt[[tr]] <- p_adj
+      use_p_adj <- TRUE
+      
+    } # Close the if else code
+    
+    ## Create a list with the grid sizes and variances
+    grid_df <- data.frame(trait = tr, 
+                          grid.rows = ifelse(is.null(grid.rows), 0, grid.rows),
+                          grid.cols = ifelse(is.null(grid.cols), 0, grid.cols),
+                          grid.layers = ifelse(is.null(grid.layers), 0, grid.layers))
+    
+    summary_df <- data.frame(trait = tr,
+                             V_R_unadjusted = V_R_p_obs, V_R_adjusted = V_R_p_adj,
+                             relative_eff = rel_eff, use_adjusted = use_p_adj)
+    
+    trait_adjusted[[tr]] <- list(grid_size = grid_df, adjustment_summary = summary_df)
+    
+    
+  } # Close the for loop
+  
+  # Collapse the list
+  trait_adjusted1 <- transpose(trait_adjusted) %>% 
+    map(bind_cols)
+  
 
-  ## Gather the data in the fbt by trait
-  fbt_tidy <- fbt %>% 
-    select_("unique_id", "row", "column", "line_name", .dots = traits) %>% 
-    gather(trait, value, -unique_id:-line_name)
-  
-  # Proceed with optimiztion if called
-  if (grid.opt) {
-  
-    # Split the tidy data into traits and apply the function
-    mvg_out_list <- fbt_tidy %>%
-      split(.$trait) %>%
-      list(., grid_list_use) %>%
-      pmap(function(fbt_trait, gr_list) {
-        
-        # Trait name
-        trait_i <- unique(fbt_trait$trait)
-      
-        # Extract the data
-        p_obs <- fbt_trait %>%
-          pull(value) %>% 
-          as.matrix()
-
-        # Notify
-        cat("\n\nOptimizing grid size for trait: ", trait_i, "\n")
-        
-        # Apply a function over the grids
-        grids_cor <- gr_list %>%
-          group_by(g.row, g.cols, g.layer) %>% 
-          do({
-            full_grid <- grid_cor(p_obs = p_obs, rows = rows, cols = cols, 
-                                  grid.rows = seq(.$g.row), grid.cols = seq(.$g.cols), 
-                                  layers = seq(.$g.layer) ) 
-            
-            no_layers <- grid_cor(p_obs = p_obs, rows = rows, cols = cols, 
-                                  grid.rows = seq(.$g.row), grid.cols = seq(.$g.cols), 
-                                  layers = NULL )
-            
-            only_cols <- grid_cor(p_obs = p_obs, rows = rows, cols = cols, 
-                                  grid.rows = NULL, grid.cols = seq(.$g.cols), 
-                                  layers = NULL )
-            
-            only_rows <- grid_cor(p_obs = p_obs, rows = rows, cols = cols, 
-                                  grid.rows = seq(.$g.row), grid.cols = NULL, 
-                                  layers = NULL )
-            
-            data.frame(full_grid, no_layers, only_cols, only_rows) }) %>%
-          ungroup()
-        
-        ## Determine which grid scheme is optimial
-        # Find the maximum correlation for each grid type
-        opt_grid <- grids_cor %>% 
-          gather(grid_type, value, -g.row, -g.cols, -g.layer) %>% 
-          top_n(n = 1, wt = value) %>%
-          # If a tie, take the smallest grid
-          head(1)
-        
-        # Depending on which grid scenario prevailed, set the optimal grid
-        ## sizes for the moving average
-        if (opt_grid$grid_type == "full_grid") {
-          grid.rows <- seq_len(opt_grid$g.row)
-          grid.cols <- seq_len(opt_grid$g.cols)
-          grid.layers <- seq_len(opt_grid$g.layer)
-        
-        } else if (opt_grid$grid_type == "no_layers") {
-          grid.rows <- seq_len(opt_grid$g.row)
-          grid.cols <- seq_len(opt_grid$g.cols)
-          grid.layers <- NULL
-        
-        } else if (opt_grid$grid_type == "only_cols") {
-          grid.rows <- NULL
-          grid.cols <- seq_len(opt_grid$g.cols)
-          grid.layers <- NULL
-        
-        } else if (opt_grid$grid_type == "only_rows") {
-          grid.rows <- seq_len(opt_grid$g.row)
-          grid.cols <- NULL
-          grid.layers <- NULL
-        }
-        
-        # Run the moving grid and Return the results
-        mv.out <- movingGrid(rows = rows, columns = cols, obsPhe = p_obs,
-                   shapeCross = list(
-                     grid.rows,
-                     grid.rows,
-                     grid.cols,
-                     grid.cols ),
-                   layers = grid.layers, excludeCenter = TRUE)
-        
-        p_adj <- fitted(mv.out) %>% 
-          as.vector()
-        
-        # Add the trait to the fbt
-        fbt_trait_x <- fbt_trait %>%
-          mutate(type = "unadjusted")
-        
-        fbt_trait_y <- fbt_trait %>% 
-          mutate(value = p_adj, 
-                 type = "adjusted")
-        
-        fbt_trait1 <- full_join(x = fbt_trait_x, y = fbt_trait_y, 
-                                by = c("unique_id", "row", "column", "line_name", "trait", "value", "type"))
-          
-        # Return
-        list(fbt.trait = fbt_trait1,
-             grid.size = list(grid.rows = grid.rows, grid.cols = grid.cols, grid.layers = grid.layers))
-      
-    })
-    
-  # No grid optimiation
-  } else {
-    
-    # Split the tidy data into traits and apply the function
-    mvg_out_list <- fbt_tidy %>%
-      split(.$trait) %>%
-      list(., grid.size) %>%
-      pmap(function(fbt_trait, gr_list) {
-        
-        # Trait name
-        trait_i <- unique(fbt_trait$trait)
-        
-        # Extract the data
-        p_obs <- fbt_trait %>%
-          pull(value) %>% 
-          as.matrix()
-  
-        # Prepare the grid sizes
-        grid.dims <- gr_list %>% 
-          map(seq)
-        
-        # Run the moving grid and Return the results
-        mv.out <- movingGrid(rows = rows, columns = cols, obsPhe = p_obs,
-                             shapeCross = list(
-                               grid.dims$grid.rows,
-                               grid.dims$grid.rows,
-                               grid.dims$grid.cols,
-                               grid.dims$grid.cols ),
-                             layers = grid.dims$grid.layers, excludeCenter = TRUE)
-        
-        p_adj <- fitted(mv.out) %>% 
-          as.vector()
-        
-        # Add the trait to the fbt
-        fbt_trait_x <- fbt_trait %>%
-          mutate(type = "unadjusted")
-        
-        fbt_trait_y <- fbt_trait %>% 
-          mutate(value = p_adj, 
-                 type = "adjusted")
-        
-        fbt_trait1 <- full_join(x = fbt_trait_x, y = fbt_trait_y, 
-                                by = c("unique_id", "row", "column", "line_name", "trait", "value", "type"))
-        
-        # Return
-        list(fbt.trait = fbt_trait1,
-             grid.size = grid.dims)
-        
-      })
-    
-  }
-  
-  ## Recombine the fbt
-  fbt.tidy1 <- lapply(X = mvg_out_list, FUN = function(i) i$fbt.trait) %>%
-    bind_rows()
-  
-  # Measure the phenotypic variance
-  fbt.summary1 <- fbt.tidy1 %>%
-    group_by(trait, type) %>%
-    summarize(V_P = var(value, na.rm = T))
-  
-  # Measure residual variance
-  fbt.summary2 <- fbt.tidy1 %>%
-    filter(line_name %in% checks) %>%
-    group_by(trait, type) %>%
-    do(fit = lm(value ~ line_name, data = .)) %>%
-    bind_cols(., summarize(., V_R = sigma(fit) ^ 2)) %>%
-    select(-fit)
-    
-  # Combine and calculate relative efficiency
-  fbt.adj.summary <- full_join(fbt.summary1, fbt.summary2, by = c("trait", "type"))
-  # Calculate relative efficiency
-  fbt.adj.summary <- fbt.adj.summary %>%
-    full_join(., fbt.adj.summary %>%
-                select(., -V_P) %>% 
-                spread(type, V_R) %>% 
-                summarize(rel_eff = unadjusted / adjusted),
-              by = "trait") %>%
-    
-    # Ungroup
-    ungroup()
-  
-  # Select the traits to keep adjusted data by observing the relative efficiency
-  if (use.rel.eff) {
-    
-    # Trait to keep spatially-adjusted data
-    trait.to.keep <- fbt.adj.summary %>% 
-      filter(rel_eff > 1) %>% 
-      select(trait) %>% 
-      distinct() %>%
-      as.matrix() %>%
-      as.character()
-    
-    # Otherwise choose the spatial adjustment for all traits
-  } else {
-    
-    trait.to.keep <- fbt.adj.summary %>% 
-      select(trait) %>% 
-      distinct() %>%
-      as.matrix() %>%
-      as.character()
-  }
-  
-  # If no traits are to be kept, output the original fbt
-  if (length(trait.to.keep) == 0) {
-    
-    fbt2 <- fbt
-    
-  } else {
-    
-    # Subset the adjusted data for those traits
-    fbt2 <- fbt.tidy1 %>% 
-      filter(trait %in% trait.to.keep, type == "adjusted") %>% 
-      select(-type) %>% 
-      spread(trait, value) %>%
-      full_join(x = fbt, y = ., by = c("unique_id", "row", "column", "line_name")) %>%
-      
-      # Select the traits that end in y (i.e. the adjusted traits)
-      select(-ends_with(".x"))
-    
-    # Rename
-    names(fbt2) <- names(fbt2) %>% 
-      str_replace_all(pattern = "\\.y", replacement = "")
-    
-  }
-    
-    
-    # Get the grid sizes from the results
-    grid.specs <- sapply(X = mvg_out_list, FUN = function(i) 
-      # Return the number of rows, cols, layers, etc
-      sapply(i$grid.size, length) )
-      
-    
-    # Return data
-    return.list <- list(fbt.adj = fbt2, summary = fbt.adj.summary, 
-                        grid.size = grid.specs)
-    return(return.list)
+  # Return data
+  return.list <- list(fbt = fbt, summary = trait_adjusted1)
+  return(return.list)
     
 } # Close the function

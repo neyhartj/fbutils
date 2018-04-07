@@ -10,8 +10,8 @@
 #' Defaults to all \code{numeric} traits.
 #' 
 #' @import dplyr
-#' @import tidyr
 #' @import ggplot2
+#' @importFrom stats median
 #' 
 #' @export
 #' 
@@ -47,32 +47,24 @@ fb_heatmap <- function(fbt, traits) {
   fbt1$row <- as.factor(fbt1$row)
   fbt1$column <- as.factor(fbt1$column)
   
-  # Tidy
-  fbt1 <- fbt1 %>% 
-    gather(trait, value, -row, -column)
-  
-  # Calculate mid-point for each trait
-  fbt2 <- fbt1 %>%
-    full_join(fbt1 %>% 
-                group_by(trait) %>% 
-                summarize(midpoint = mean(value, na.rm = TRUE)),
-              by = "trait")
-  
   # Iterate over traits
   for (tr in traits) {
     
-    # Extract the values for that trait
-    fbt.tr <- fbt2 %>%
-      filter(trait %in% tr)
+    # Calculate the median
+    values <- as.vector(fbt1[[tr]])
+    tr_median <- median(x = values)
+    
+    row <- fbt1$row
+    column <- fbt1$column
     
     # Plot
-    gp <- fbt.tr %>%
-      ggplot(aes(x = column, y = row, fill = value)) +
+    gp <- ggplot(data = fbt1, aes(x = column, y = row, fill = values)) +
       geom_tile() +
       scale_fill_gradient2(low = "blue", mid = "white", high = "red", 
-                           midpoint = unique(fbt.tr$midpoint)) +
+                           midpoint = tr_median) +
       ggtitle(tr)
     
+    # Print the plot
     print(gp)
     
   }
