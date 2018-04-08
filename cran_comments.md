@@ -1,9 +1,12 @@
 ## Test environment
-L
+* local Windows install, R 3.4.3
+* ubuntu 14.04.5 (on travis-ci), R 3.4.4
 
 
 ## R CMD Check comments
 There were no ERRORs, WARNINGs, or NOTEs
+
+This is the first submission of this package to CRAN
 
 
 ## Downstream dependencies

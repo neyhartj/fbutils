@@ -226,9 +226,9 @@ Spatial adjustment is another important step in processing field-based data. Oft
 
 $$H = \frac{V_G}{(V_G + V_R)}$$. 
 
-A suitable method of performing spatial adjustment (regardless of the trial design) is a moving average. The `fbutils` package implements the moving average procedure developed in the [`mvngGrAd`](https://cran.r-project.org/web/packages/mvngGrAd/index.html) package. The `fb_spatial_adj()` function will perform this moving average adjustment for traits. Using checks to measure the within-environment variance ($V_R$), the function determines whether spatial adjustment, in fact, reduced this variation. If so, the adjusted values are retained, but if not, the raw values are retained.
+A suitable method of performing spatial adjustment (regardless of the trial design) is a moving average. The `fbutils` package implements the moving average procedure developed in the [`mvngGrAd`](https://CRAN.R-project.org/package=mvngGrAd) package. The `fb_spatial_adj()` function will perform this moving average adjustment for traits. Using checks to measure the within-environment variance ($V_R$), the function determines whether spatial adjustment, in fact, reduced this variation. If so, the adjusted values are retained, but if not, the raw values are retained.
 
-The `fb_spatial_adj` function can be run by providing moving average grid dimensions (see the [`mvngGrAd` package vignette] (https://cran.r-project.org/web/packages/mvngGrAd/mvngGrAd.pdf) for more information).
+The `fb_spatial_adj` function can be run by providing moving average grid dimensions (see the [`mvngGrAd` package vignette] (https://CRAN.R-project.org/package=mvngGrAd/mvngGrAd.pdf) for more information).
 
 For instance, the `SpatialGradient` trait could be adjusted using a grid of 4 columns, 2 rows, and 2 layers (i.e. diagonals):
 
