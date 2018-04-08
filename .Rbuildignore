@@ -1,7 +1,6 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
-cran_comments.md
-^cran_comments\.md$
+^cran-comments\.md$
 ^fbutils_shiny/*$
 ^\.travis\.yml$
 ^TODO\.md$
