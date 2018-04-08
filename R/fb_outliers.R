@@ -4,7 +4,7 @@
 #' @param traits A \code{character} of traits for which outliers should be 
 #' discovered. Defaults to all numeric traits.
 #' @param max.sd A \code{numeric} determining the number of standard deviations from
-#' the mean to use when labelling outliers.
+#' the mean to use when labeling outliers.
 #' 
 #' @details 
 #' Outliers are defined as observations that are outside of a specified boundary

@@ -11,7 +11,7 @@
 #' data would be "1 2 3". The vector must be the same length as 'traits.'
 #' 
 #' @return 
-#' An fbt object with unparsed trait columns and with with individual columns for 
+#' An fbt object with un-parsed trait columns and with with individual columns for 
 #' each datapoint entry in each multicat trait. The mean and standard deviation 
 #' of all datapoint entries are also included.
 #' 

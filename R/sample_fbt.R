@@ -2,7 +2,7 @@
 #' 
 #' A \code{data.frame} to be used as a sample for demonstrations of the 
 #' \code{fbutils} functions. It contains required columns like the unique id,
-#' row, colunmn, and line name, along with others such as tray number
+#' row, column, and line name, along with others such as tray number
 #' and pedigree. The data frame also contains data for traits of different
 #' classes (i.e. continuous, categorical, multi-categorical). Variables are as follows:
 #' 
@@ -13,7 +13,7 @@
 #'  \item line_name The name of the entry
 #'  \item plot The plot number
 #'  \item tray_row:pedigree Extra information unique to this field book table
-#'  \item Continuous A simulated continous trait (e.g. height)
+#'  \item Continuous A simulated continuous trait (e.g. height)
 #'  \item Discrete A simulated categorical/discrete trait (e.g. lodging degree)
 #'  \item Multi A simulated multi-categorical trait (e.g. multiple disease ratings on a single plot)
 #'  \item OneOutlier A simulated continuous trait with a single outlier
