@@ -21,7 +21,7 @@ multicat data points was "1:2:3:4:5" and n.obs was set to 3, the resulting
 data would be "1 2 3". The vector must be the same length as 'traits.'}
 }
 \value{
-An fbt object with unparsed trait columns and with with individual columns for 
+An fbt object with un-parsed trait columns and with with individual columns for 
 each datapoint entry in each multicat trait. The mean and standard deviation 
 of all datapoint entries are also included.
 }

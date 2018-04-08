@@ -13,7 +13,7 @@ fb_outliers(fbt, traits, max.sd = 3)
 discovered. Defaults to all numeric traits.}
 
 \item{max.sd}{A \code{numeric} determining the number of standard deviations from
-the mean to use when labelling outliers.}
+the mean to use when labeling outliers.}
 }
 \value{
 A list of length \code{n}, where \code{n} is the number of traits. Each list
