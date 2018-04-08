@@ -1,6 +1,7 @@
 ## Test environment
 * local Windows install, R 3.4.3
 * ubuntu 14.04.5 (on travis-ci), R 3.4.4
+* win-builder (devel and release)
 
 
 ## R CMD Check comments

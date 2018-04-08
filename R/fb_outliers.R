@@ -2,9 +2,29 @@
 #' 
 #' @param fbt A Field Book Table object.
 #' @param traits A \code{character} of traits for which outliers should be 
-#' discovered. By default all numeric traits are examined.
+#' discovered. Defaults to all numeric traits.
 #' @param max.sd A \code{numeric} determining the number of standard deviations from
 #' the mean to use when labelling outliers.
+#' 
+#' @details 
+#' Outliers are defined as observations that are outside of a specified boundary
+#' as determined by the sample mean \eqn{\mu} and standard deviation \code{s}. 
+#' The lower limit of this boundary is \eqn{\mu - (\code{max.sd} * s)} and
+#' the upper limit is \eqn{\mu + (\code{max.sd} * s)}.
+#' 
+#' The function prints a summary that includes the trait, sample mean, sample
+#' standard deviation, number of missing data points, and the upper and lower
+#' bounds of the outlier cutoff. Finally, the function prints the row from the 
+#' fbt object in which the outlier was identified.
+#' 
+#' @return 
+#' A list of length \code{n}, where \code{n} is the number of traits. Each list
+#' element is a data.frame containing the outliers.
+#'
+#' @examples
+#' data("fbt_sample")
+#' 
+#' outliers <- fb_outliers(fbt = fbt_sample, traits = "OneOutlier", max.sd = 3)
 #' 
 #' @import dplyr
 #' @importFrom stats sd

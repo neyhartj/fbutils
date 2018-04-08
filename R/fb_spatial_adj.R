@@ -1,9 +1,8 @@
 #' Spatial adjustment of observations
 #' 
 #' @description
-#' Uses a moving grid to adjust the phenotypic observations
-#' recorded in a Field Book table. This function wraps around 
-#' functions provided in the \code{\link[mvngGrAd]{mvngGrAd}}
+#' Uses a moving grid to adjust the phenotypic observations recorded in a Field Book 
+#' table. This function wraps around functions provided in the \code{\link[mvngGrAd]{mvngGrAd}}
 #' package.
 #' 
 #' @param fbt A Field Book Table object.
@@ -11,25 +10,54 @@
 #' @param checks A \code{character} of field.book.table entry names designated
 #' as checks.
 #' @param grid.size A nested \code{list} of grid dimensions that define the 
-#' moving average grid. The first layer of the list must be the same length
-#' as the number of traits, and the names of this layer must be the trait names.
-#' The second layer of the list must have the components \code{grid.rows}, 
-#' \code{grid.cols}, and \code{grid.layers}. See \code{Details} for what these 
-#' indicate. If \code{grid.size} is \code{NULL}, the grid size is optimized.
+#' moving average grid. If \code{grid.size} is \code{NULL}, the grid size is 
+#' optimized. See \emph{Details} for more information.
 #' @param max.grid.size A nested \code{list}, similar to \code{grid.size}, but 
 #' instead defining the maximum grid dimensions to use when optimizing the 
 #' grid size. Here the components \code{grid.rows}, \code{grid.cols}, and 
 #' \code{grid.layers} are integers defining the maximum rows, columns, and diagonal
 #' layers to use, respectively. Use this option if the field dimensions are large.
 #' This argument is ignored if \code{grid.size} is passed.
-#' @param use.rel.eff \code{Logical} If \code{TRUE}, the relative efficiency is
+#' @param use.rel.eff If \code{TRUE}, the relative efficiency is
 #' used to determine whether the adjusted data for a trait replaces the raw data
-#' in the \code{field.book.table}. If \code{FALSE}, both raw and adjusted data
-#' is added to the \code{field.book.table}.
+#' in the fbt object. If \code{FALSE}, the adjusted data replaces the raw data.
 #' 
 #' @details 
-#' Details to come
+#' This function uses the moving average procedure implemented in \code{\link[mvngGrAd]{mvngGrAd}}
+#' to spatially adjust the raw phenotypic observations from a grid. Briefly,
+#' the function uses the mean of observations surrounding a particularly plot
+#' in a field as a covariate to calculate the adjusted phenotypic value.
 #' 
+#' One can define the dimensions of the grid by passing a list to the \code{grid.size}
+#' argument. The first layer of the list must be the same length as the number 
+#' of traits, and the names of this layer must be the trait names. The second 
+#' layer of the list must have the components \code{grid.rows}, \code{grid.cols}, 
+#' and \code{grid.layers}. \code{grid.rows} and \code{grid.cols} define the
+#' number of \emph{field} rows and columns covered by the grid, respectively,
+#' while \code{grid.layers} defines the number of diagonal plots.
+#' 
+#' Alternatively, one can optimize the grid size for each trait. Grid optimization
+#' iterates over all possible grid dimensions and identifies the grid size that
+#' maximizes the correlation between the adjusted phenotypic values and the mean
+#' of the phenotypic values within that grid.
+#' 
+#' Finally, the adjusted phenotypic values can be kept or ignored depending 
+#' on whether the within-environment variance (i.e. \eqn{V_R}) is reduced after
+#' adjustment. This function uses the individuals specified in \code{checks} to
+#' calculate this variance. Generally, traits that are less heritable tend to 
+#' benefit from spatial adjustment.
+#' 
+#' @return 
+#' A list with two elements:
+#' 
+#' \describe{
+#'   \item{fbt}{An fbt object with adjusted phenotypic values replacing the 
+#'   original values, if applicable.}
+#'   \item{summary}{A list with 2 elements: the first returns the grid size 
+#'   used for each trait. The second returns summary statistics of the adjustment
+#'   procedure, including the within-environment variance, relative efficiency,
+#'   and whether the adjusted values were returned in place of the original values.}
+#' }
 #' 
 #' @import mvngGrAd
 #' @import dplyr

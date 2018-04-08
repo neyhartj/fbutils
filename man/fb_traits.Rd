@@ -4,13 +4,13 @@
 \alias{fb_traits}
 \title{Extract the trait names from a Field Book Table}
 \usage{
-fb_traits(fbt, mode = NULL)
+fb_traits(fbt, mode = c("all", "character", "numeric", "logical"))
 }
 \arguments{
 \item{fbt}{A \code{field.book.table} object.}
 
-\item{mode}{The class of traits to be returned. May be \code{character}, 
-\code{numeric} or \code{logical}.}
+\item{mode}{The class of traits to be returned. May be \code{"all"} (default),
+\code{"character"}, \code{"numeric"} or \code{"logical"}.}
 }
 \description{
 Returns a character vector of trait names of the desired mode

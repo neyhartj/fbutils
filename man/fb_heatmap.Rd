@@ -9,12 +9,22 @@ fb_heatmap(fbt, traits)
 \arguments{
 \item{fbt}{A Field Book Table object.}
 
-\item{traits}{\code{Character} column name of for which to plot heatmaps.
-Defaults to all \code{numeric} traits.}
+\item{traits}{A character vector specifying the trait to plot. Defaults to all
+numeric traits.}
 }
 \description{
-Creates a heatmap image for each numeric trait in the field_book_table 
-file. An option for exporting a PDF of these images is provided. This function works best with
-raw field_book_table files, so this could be used immediately after exporting
-a file from the Field Book App.
+Creates a heatmap image for each numeric trait in an fbt object .
+}
+\examples{
+
+\dontrun{
+data("fbt_sample")
+
+# Plot the trait 'Continuous'
+fb_heatmap(fbt = fbt_sample, traits = "Continuous")
+
+# Plot all traits
+fb_heatmap(fbt = fbt_sample)
+}
+
 }

@@ -2,7 +2,7 @@
 #' 
 #' @param fbt A Field Book Table object.
 #' @param traits A \code{character} vector of trait names identifying which column(s) in the
-#' field_book_table.csv file to parse.
+#' fbt object file to parse.
 #' @param sep Character(s) used to split the multicat data entries.
 #' @param n.obs An \code{numeric} vector of integers describing the number
 #' of desired datapoint observations in a multicat trait. The first n observations will be
@@ -10,13 +10,18 @@
 #' multicat data points was "1:2:3:4:5" and n.obs was set to 3, the resulting
 #' data would be "1 2 3". The vector must be the same length as 'traits.'
 #' 
-#' @return A \code{data.frame} of the original field_book_table.csv data but with
-#' individual columns for each datapoint entry in each multicat trait. The mean and
-#' standard deviation of all datapoint entries are also included.
+#' @return 
+#' An fbt object with unparsed trait columns and with with individual columns for 
+#' each datapoint entry in each multicat trait. The mean and standard deviation 
+#' of all datapoint entries are also included.
 #' 
-#' @import dplyr
-#' @import stringr
-#' @import tidyr
+#' @examples 
+#' data("fbt_sample")
+#' 
+#' # Parse the 'Multi' trait
+#' fbt1 <- fb_parse(fbt = fbt_sample, traits = "Multi", sep = ":")
+#' 
+#' @importFrom dplyr bind_cols
 #' 
 #' @export
 #' 

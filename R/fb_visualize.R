@@ -3,11 +3,11 @@
 #' @description 
 #' Create histograms or boxplots of each trait in the field book table
 #' 
-#' @param fbt A Field Book Table (i.e. from reading in data using \code{read.fb})
-#' @param traits \code{Character} column name of for which to plot heatmaps.
-#' Defaults to all \code{numeric} traits.
+#' @param fbt A Field Book Table object.
+#' @param traits A character vector specifying the trait to plot. Defaults to all
+#' numeric traits.
 #' @param graph The type of plot to produce. Accepted values are \code{"boxplot"}
-#' or \code{"histogram"}.
+#' (default) or \code{"histogram"}.
 #' @param bins The number of bins to force in the histogram.
 #' @param nrow The number of graphs to display in a column. See 
 #' \code{\link[ggplot2]{facet_wrap}}.
@@ -30,8 +30,8 @@
 #' 
 #' @export
 #' 
-fb_visualize <- function(fbt, traits, graph = "boxplot", bins = 30, nrow = NULL, 
-                         ncol = NULL) {
+fb_visualize <- function(fbt, traits, graph = c("boxplot", "histogram"), bins = 30, 
+                         nrow = NULL, ncol = NULL) {
   
   ## Error handling
 
@@ -46,6 +46,9 @@ fb_visualize <- function(fbt, traits, graph = "boxplot", bins = 30, nrow = NULL,
   
   if (!is.character(graph)) stop("'graph' must be a character.")
   
+  # Match arguments for graph
+  graph <- match.arg(graph)
+  
   ## Reformat
   traits <- as.character(traits)
   graph <- as.character(graph)
@@ -56,11 +59,6 @@ fb_visualize <- function(fbt, traits, graph = "boxplot", bins = 30, nrow = NULL,
   # Make sure the traits are numeric
   if (any(!traits %in% num.traits))
     stop(paste(c(traits[!traits %in% num.traits], " is/are not among the numeric variables in the field.book.table.")))
-  
-  # Make sure graph is one of the accepted inputs
-  if (!graph %in% c("boxplot", "histogram"))
-    stop("The input for 'graph' is not accepted. Accepted inputs are 'boxplot'
-         or 'histogram.'")
   
   ## Tidy the data
   

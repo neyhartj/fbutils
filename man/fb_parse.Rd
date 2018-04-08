@@ -10,7 +10,7 @@ fb_parse(fbt, traits, sep = ":", n.obs = 10)
 \item{fbt}{A Field Book Table object.}
 
 \item{traits}{A \code{character} vector of trait names identifying which column(s) in the
-field_book_table.csv file to parse.}
+fbt object file to parse.}
 
 \item{sep}{Character(s) used to split the multicat data entries.}
 
@@ -21,10 +21,17 @@ multicat data points was "1:2:3:4:5" and n.obs was set to 3, the resulting
 data would be "1 2 3". The vector must be the same length as 'traits.'}
 }
 \value{
-A \code{data.frame} of the original field_book_table.csv data but with
-individual columns for each datapoint entry in each multicat trait. The mean and
-standard deviation of all datapoint entries are also included.
+An fbt object with unparsed trait columns and with with individual columns for 
+each datapoint entry in each multicat trait. The mean and standard deviation 
+of all datapoint entries are also included.
 }
 \description{
 Parse data from non-standard traits
+}
+\examples{
+data("fbt_sample")
+
+# Parse the 'Multi' trait
+fbt1 <- fb_parse(fbt = fbt_sample, traits = "Multi", sep = ":")
+
 }

@@ -48,7 +48,6 @@ Reads in data from a Field Book Table as a \code{fbt} object.
 \code{as_field_book_table} converts data to a \code{data.frame} object with
 formatting consistent with the Field Book Table.
 
-
 A Field Book Table is a .csv file obtained by exporting data from the Field
 Book app (\url{http://wheatgenetics.org/field-book}). See the app 
 manual for instructions for exporting data. To export a Field Book Table file, 

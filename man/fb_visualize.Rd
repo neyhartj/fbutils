@@ -4,17 +4,17 @@
 \alias{fb_visualize}
 \title{Visualize a summary of the field book data}
 \usage{
-fb_visualize(fbt, traits, graph = "boxplot", bins = 30, nrow = NULL,
-  ncol = NULL)
+fb_visualize(fbt, traits, graph = c("boxplot", "histogram"), bins = 30,
+  nrow = NULL, ncol = NULL)
 }
 \arguments{
-\item{fbt}{A Field Book Table (i.e. from reading in data using \code{read.fb})}
+\item{fbt}{A Field Book Table object.}
 
-\item{traits}{\code{Character} column name of for which to plot heatmaps.
-Defaults to all \code{numeric} traits.}
+\item{traits}{A character vector specifying the trait to plot. Defaults to all
+numeric traits.}
 
 \item{graph}{The type of plot to produce. Accepted values are \code{"boxplot"}
-or \code{"histogram"}.}
+(default) or \code{"histogram"}.}
 
 \item{bins}{The number of bins to force in the histogram.}
 

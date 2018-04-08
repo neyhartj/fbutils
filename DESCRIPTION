@@ -8,7 +8,7 @@ Description: This package provides some functions for handling data from the
     provide options to quickly visualize this data, detect outliers, and perform
     spatial adjustment. It is intended to work in a data processing pipeline.
 Depends:
-    R (>= 3.4.3)
+    R (>= 3.4.0)
 Imports:
     dplyr,
     ggplot2,

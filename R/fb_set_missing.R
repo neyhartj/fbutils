@@ -9,7 +9,17 @@
 #' @param unique_ids A \code{character} vector of unique identifiers for which
 #' observations should be set to missing.
 #' 
-#' @import dplyr
+#' @return 
+#' An fbt object with the specified observations set to missing (i.e. \code{NA})
+#' 
+#' @examples 
+#' data("fbt_sample")
+#' 
+#' # Detect the outlier in the 'OneOutlier' trait using 'fb_outliers()'
+#' outliers <- fb_outliers(fbt = fbt_sample, traits = "OneOutlier")
+#' 
+#' # Set this outlier to NA
+#' fbt1 <- fb_set_missing(fbt = fbt_sample, traits = "OneOutlier", unique_ids = "13RPN00010")
 #'  
 #' @export
 #' 

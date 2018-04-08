@@ -1,13 +1,22 @@
 #' Generate a heatmap of field data
 #' 
-#' @description Creates a heatmap image for each numeric trait in the field_book_table 
-#' file. An option for exporting a PDF of these images is provided. This function works best with
-#' raw field_book_table files, so this could be used immediately after exporting
-#' a file from the Field Book App. 
+#' @description Creates a heatmap image for each numeric trait in an fbt object .
 #' 
 #' @param fbt A Field Book Table object.
-#' @param traits \code{Character} column name of for which to plot heatmaps.
-#' Defaults to all \code{numeric} traits.
+#' @param traits A character vector specifying the trait to plot. Defaults to all
+#' numeric traits.
+#' 
+#' @examples 
+#' 
+#' \dontrun{
+#' data("fbt_sample")
+#' 
+#' # Plot the trait 'Continuous'
+#' fb_heatmap(fbt = fbt_sample, traits = "Continuous")
+#' 
+#' # Plot all traits
+#' fb_heatmap(fbt = fbt_sample)
+#' }
 #' 
 #' @import dplyr
 #' @import ggplot2

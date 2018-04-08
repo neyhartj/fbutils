@@ -3,11 +3,11 @@ citHeader("To cite fbutils in publications use:")
 citEntry(entry = "Manual",
   title        = "{fbutils}: Data Processing in Agriculture Field Trials",
   author       = personList(as.person("Jeff Neyhart")),
-  year         = "2016",
+  year         = "2018",
   note         = "R package version 0.1.0",
 
   textVersion  =
-  paste("Jeff Neyhart (2016).",
+  paste("Jeff Neyhart (2018).",
         "fbutils: Data Processing in Agriculture Field Trials.",
         "R package version 0.1.0.")
 )
