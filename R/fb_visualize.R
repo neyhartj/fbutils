@@ -86,6 +86,6 @@ fb_visualize <- function(fbt, traits, graph = c("boxplot", "histogram"), bins = 
   }
   
   # Print the graph
-  print(gp1)
+  print(gp)
   
 } # Close the function
