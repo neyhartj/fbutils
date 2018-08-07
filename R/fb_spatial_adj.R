@@ -371,11 +371,13 @@ fb_spatial_adj <- function(fbt, traits, checks, grid.size = NULL, max.grid.size 
     grid_df <- data.frame(trait = tr, 
                           grid.rows = ifelse(is.null(grid.rows), 0, grid.rows),
                           grid.cols = ifelse(is.null(grid.cols), 0, grid.cols),
-                          grid.layers = ifelse(is.null(grid.layers), 0, grid.layers))
+                          grid.layers = ifelse(is.null(grid.layers), 0, grid.layers),
+                          stringsAsFactors = FALSE)
     
     summary_df <- data.frame(trait = tr,
                              V_R_unadjusted = V_R_p_obs, V_R_adjusted = V_R_p_adj,
-                             relative_eff = rel_eff, use_adjusted = use_p_adj)
+                             relative_eff = rel_eff, use_adjusted = use_p_adj,
+                             stringsAsFactors = FALSE)
     
     trait_adjusted[[tr]] <- list(grid_size = grid_df, adjustment_summary = summary_df)
     
@@ -384,7 +386,7 @@ fb_spatial_adj <- function(fbt, traits, checks, grid.size = NULL, max.grid.size 
   
   # Collapse the list
   trait_adjusted1 <- transpose(trait_adjusted) %>% 
-    map(bind_cols)
+    map(bind_rows)
   
 
   # Return data
