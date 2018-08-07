@@ -2,11 +2,7 @@ Package: fbutils
 Title: Data Processing in Agriculture Field Trials
 Version: 0.1.0
 Authors@R: person("Jeff", "Neyhart", email = "neyhartje@gmail.com", role = c("aut", "cre"))
-Description: This package provides some functions for handling data from the
-    from the Field Book Android app. This app is used primarily for gathering
-    trait data in breeding program experiments. The functions in this package
-    provide options to quickly visualize this data, detect outliers, and perform
-    spatial adjustment. It is intended to work in a data processing pipeline.
+Description: BETTER DESCRIPTION
 Depends:
     R (>= 3.4.0)
 Imports:

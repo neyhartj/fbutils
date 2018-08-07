@@ -1,8 +1,2 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
-^cran-comments\.md$
-^fbutils_shiny/*$
-^\.travis\.yml$
-^TODO\.md$
-^sandbox\.R$
-^README\.Rmd$

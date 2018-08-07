@@ -61,7 +61,7 @@ fb_heatmap <- function(fbt, traits) {
     
     # Calculate the median
     values <- as.vector(fbt1[[tr]])
-    tr_median <- median(x = values)
+    tr_median <- median(x = values, na.rm = TRUE)
     
     row <- fbt1$row
     column <- fbt1$column
