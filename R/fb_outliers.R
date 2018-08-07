@@ -78,7 +78,7 @@ fb_outliers <- function(fbt, traits, max.sd = 3) {
     lower_bound <- tr_mean - (tr_sd * max.sd)
     
     ## Detect outliers
-    is_outlier <- tr_values < lower_bound | tr_values > upper_bound
+    is_outlier <- which(tr_values < lower_bound | tr_values > upper_bound)
     
     # Subset the data for those outliers
     fbt_trait <- fbt[,names(fbt) %in% c("unique_id", "row", "column", "line_name", tr)]

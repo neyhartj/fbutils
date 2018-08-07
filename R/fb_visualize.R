@@ -63,30 +63,24 @@ fb_visualize <- function(fbt, traits, graph = c("boxplot", "histogram"), bins = 
   ## Tidy the data
   
   # Extract the traits, and gather
-  fbt.gather <- fbt %>%
-    select_(.dots = traits) %>%
-    gather_("trait", "value", traits)
+  fbt.gather <- gather_(fbt[,traits], "trait", "value", traits)
+  fbt.gather1 <- subset(fbt.gather, !is.na(value))
   
   # Extract the columns
-  trait <- fbt.gather$trait
-  value <- fbt.gather$value
+  trait <- fbt.gather1$trait
+  value <- fbt.gather1$value
   
-  # Create the base graph
-  gp <- fbt.gather %>%
-    ggplot()
   
   if (graph == "boxplot") {
     
-    gp1 <- gp + 
-      geom_boxplot(mapping = aes_(trait, value)) +
+    gp <- qplot(x = trait, y = value, geom = graph, data = fbt.gather1) +
       facet_wrap(~ trait, scales = "free", ncol = ncol, nrow = nrow)
     
   }
   
   if (graph == "histogram") {
     
-    gp1 <- gp + 
-      geom_histogram(mapping = aes_(value), bins = 30) +
+    gp <- qplot(x = value, geom = graph, data = fbt.gather1, bins = bins) +
       facet_wrap(~ trait, scales = "free", ncol = ncol, nrow = nrow)
     
   }
