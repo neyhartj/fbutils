@@ -144,19 +144,17 @@ fb_spatial_adj <- function(fbt, traits, checks, grid.size = NULL, max.grid.size 
     # Design a data.frame of possible grid sizes
     
     # All columns in the field
-    lat <- seq(max(cols) - 1) 
+    lat <- max(cols) - 1
     # All rows
-    long <- seq(max(rows) - 1)
+    long <- max(rows) - 1
     
-    grids <- data.frame(g.row = rep(long, each = length(lat)),
-                        g.cols = rep(lat, length(long))) 
-    # Add layers
+    grids <- expand.grid(g.row = seq(0, long), g.cols = seq(0, lat), stringsAsFactors = FALSE)[-1,,drop = FALSE]
     grids$g.layer <- pmin(grids$g.row, grids$g.cols)
     
     
     # Create a list of grids of length n_trait
-    grid_list <- rep(list(grids), length(traits)) %>%
-      setNames(nm = traits)
+    grid_list <- rep(list(grids), length(traits))
+    grid_list <- setNames(object = grid_list, nm = traits)
     
     # If max.grid.size is passed, use that information to restrict the grid sizes
     if (!is.null(max.grid.size)) {
@@ -186,10 +184,8 @@ fb_spatial_adj <- function(fbt, traits, checks, grid.size = NULL, max.grid.size 
       max.grid.size <- max.grid.size[traits]
       
       # Determine the grid sizes that are less than the max grid size
-      
-    
-      grid_list_use <- list(grid_list, max.grid.size) %>% 
-        pmap(function(gr, max.gr) {
+      grid_list_use <- list(grid_list, max.grid.size)
+      grid_list_use <- pmap(grid_list_use, function(gr, max.gr) {
           grids_tokeep <- (gr$g.row <= max.gr$grid.rows & gr$g.cols <= max.gr$grid.cols & 
                              gr$g.layer <= max.gr$grid.layers)
           gr[grids_tokeep,,drop = FALSE]
@@ -254,59 +250,31 @@ fb_spatial_adj <- function(fbt, traits, checks, grid.size = NULL, max.grid.size 
       cat("\n\nOptimizing grid size for trait: ", tr, "\n")
       
       # Apply a function over the grids
-      grids_cor <- apply(X = grid_list_use[[tr]], MARGIN = 1, FUN = function(i) {
-        full_grid <- grid_cor(p_obs = p_obs, rows = rows, cols = cols, 
-                              grid.rows = seq(i[1]), grid.cols = seq(i[2]), 
-                              layers = seq(i[3]) )
-        
-        no_layers <- grid_cor(p_obs = p_obs, rows = rows, cols = cols, 
-                              grid.rows = seq(i[1]), grid.cols = seq(i[2]), 
-                              layers = NULL )
-        
-        only_cols <- grid_cor(p_obs = p_obs, rows = rows, cols = cols, 
-                              grid.rows = NULL, grid.cols = seq(i[2]), 
-                              layers = NULL )
-        
-        only_rows <- grid_cor(p_obs = p_obs, rows = rows, cols = cols, 
-                              grid.rows = seq(i[1]), grid.cols = NULL, 
-                              layers = NULL )
-        
-        data.frame(full_grid, no_layers, only_cols, only_rows)
-        
-      }) %>% bind_rows()
+      # grids_cor <- apply(X = grid_list_use[[tr]], MARGIN = 1, FUN = function(i) {
+      grids_cor <- mapply(
+        grid_list_use[[tr]]$g.row, 
+        grid_list_use[[tr]]$g.cols, 
+        grid_list_use[[tr]]$g.layer, 
+        FUN = function(ro, co, la) {
+          
+          grid_cor(p_obs = p_obs, rows = rows, cols = cols, grid.rows = seq_len(ro), 
+                   grid.cols = seq_len(co), layers = seq_len(la))
+          
+        })
       
+      ## Add data to grids
+      grids_df <- grid_list_use[[tr]]
+      grids_df$cor = grids_cor
       
       ## Determine which grid scheme is optimial
-      # Find the maximum correlation for each grid type
-      opt_grid <- which.max(sapply(X = grids_cor, FUN = max))
-      # What type of grid
-      opt_grid_type <- names(grids_cor)[opt_grid]
-      # Extract that grid
-      grid_opt <- grid_list_use[[tr]][which.max(grids_cor[,opt_grid]),]
+      grid_opt <- grids_df[which.max(grids_df$cor),,drop = FALSE]
       
       
-      # Depending on which grid scenario prevailed, set the optimal grid
-      ## sizes for the moving average
-      if (opt_grid_type == "full_grid") {
-        grid.rows <- seq_len(grid_opt$g.row)
-        grid.cols <- seq_len(grid_opt$g.cols)
-        grid.layers <- seq_len(grid_opt$g.layer)
+      # set the optimal grid sizes for the moving average
+      grid.rows <- seq_len(grid_opt$g.row)
+      grid.cols <- seq_len(grid_opt$g.cols)
+      grid.layers <- seq_len(grid_opt$g.layer)
         
-      } else if (opt_grid_type == "no_layers") {
-        grid.rows <- seq_len(grid_opt$g.row)
-        grid.cols <- seq_len(grid_opt$g.cols)
-        grid.layers <- NULL
-        
-      } else if (opt_grid_type == "only_cols") {
-        grid.rows <- NULL
-        grid.cols <- seq_len(grid_opt$g.cols)
-        grid.layers <- NULL
-        
-      } else if (opt_grid_type == "only_rows") {
-        grid.rows <- seq_len(grid_opt$g.row)
-        grid.cols <- NULL
-        grid.layers <- NULL
-      }
       
     # If grid optimization is not specified, proceed with the moving
     # average adjustment only
@@ -368,11 +336,7 @@ fb_spatial_adj <- function(fbt, traits, checks, grid.size = NULL, max.grid.size 
     } # Close the if else code
     
     ## Create a list with the grid sizes and variances
-    grid_df <- data.frame(trait = tr, 
-                          grid.rows = ifelse(is.null(grid.rows), 0, grid.rows),
-                          grid.cols = ifelse(is.null(grid.cols), 0, grid.cols),
-                          grid.layers = ifelse(is.null(grid.layers), 0, grid.layers),
-                          stringsAsFactors = FALSE)
+    grid_df <- cbind(trait = tr, grid_opt[,1:3])
     
     summary_df <- data.frame(trait = tr,
                              V_R_unadjusted = V_R_p_obs, V_R_adjusted = V_R_p_adj,
@@ -385,8 +349,7 @@ fb_spatial_adj <- function(fbt, traits, checks, grid.size = NULL, max.grid.size 
   } # Close the for loop
   
   # Collapse the list
-  trait_adjusted1 <- transpose(trait_adjusted) %>% 
-    map(bind_rows)
+  trait_adjusted1 <- lapply(X = transpose(trait_adjusted), do.call, what = "rbind")
   
 
   # Return data

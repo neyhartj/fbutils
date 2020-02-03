@@ -4,8 +4,8 @@
 \alias{fb_spatial_adj}
 \title{Spatial adjustment of observations}
 \usage{
-fb_spatial_adj(fbt, traits, checks, grid.size = NULL, max.grid.size = NULL,
-  use.rel.eff = TRUE)
+fb_spatial_adj(fbt, traits, checks, grid.size = NULL,
+  max.grid.size = NULL, use.rel.eff = TRUE)
 }
 \arguments{
 \item{fbt}{A Field Book Table object.}
